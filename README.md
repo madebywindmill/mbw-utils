@@ -11,5 +11,5 @@ A library of common utility Swift code for use by Made by Windmill, LLC and its 
 MBWLogger logs to a log file in the shared app group directory, so:
 
 * The app must have the AppGroups entitlement
-* For each target that uses MBWLogger, the app group identifier needs to be stored as an environment variable `APP_GROUP_IDENTIFIER` 
+* For each target that uses MBWLogger, the app group identifier needs to be stored in its Info.plist with key `MBWAppGroupIdentifier` 
 
