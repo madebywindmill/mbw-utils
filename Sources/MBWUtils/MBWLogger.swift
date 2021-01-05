@@ -26,10 +26,7 @@ public class Logger {
     }
     
     public static var debugFileURL: URL {
-        guard let groupID = ProcessInfo.processInfo.environment["APP_GROUP_IDENTIFIER"] else {
-            fatalError("APP_GROUP_IDENTIFIER missing from target's env")
-        }
-        let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID)!
+        let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: MBWConstants.appGroupIdentifier)!
         return url.appendingPathComponent("debugLog.txt")
     }
 
