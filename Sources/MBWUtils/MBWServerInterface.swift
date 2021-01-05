@@ -9,17 +9,17 @@ import Foundation
 
 let serverInterfaceAPITimeout = 90.0
 
-class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDelegate {
+open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDelegate {
     
-    typealias RequestCompletionHandler = (
+    public typealias RequestCompletionHandler = (
         _ jsonDictionary: Dictionary<String,Any>?,
         _ response: HTTPURLResponse?,
         _ error: NSError?
         ) -> Void
 
-    typealias BasicCompletionHandler = (_ error: NSError?) -> Void
+    public typealias BasicCompletionHandler = (_ error: NSError?) -> Void
 
-    enum RequestOptions: String {
+    public enum RequestOptions: String {
         case queryPairs = "queryPairs"
         case headerFields = "headerFields"
         case nonMainCompletion = "nonMainCompletion" // Completions are sent on the main thread by default. If you don't want that, set this.
@@ -28,11 +28,11 @@ class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDelegate 
         case none = "none"
     }
     
-    struct Notifications {
-        static let authMissingShouldSignOutNotification = NSNotification.Name(rawValue: "authMissingShouldSignOutNotification")
+    public struct Notifications {
+        static public let authMissingShouldSignOutNotification = NSNotification.Name(rawValue: "authMissingShouldSignOutNotification")
     }
     
-    enum HTTPMethod: String {
+    public enum HTTPMethod: String {
         case get = "GET"
         case post = "POST"
         case delete = "DELETE"
@@ -40,24 +40,24 @@ class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDelegate 
         case patch = "PATCH"
     }
     
-    var baseURL: URL!
+    open var baseURL: URL!
     
     // Set for Bearer Token auth
-    var accessToken: String?
+    public var accessToken: String?
     
     // Set both for Basic auth
-    var basicUsername: String?
-    var basicPassword: String?
+    public var basicUsername: String?
+    public var basicPassword: String?
     
-    static let insertedArrayKey = "<mbwInsertedArrayKey>"
-    static let insertedDataKey = "<mbwInsertedDataKey>"
+    static public let insertedArrayKey = "<mbwInsertedArrayKey>"
+    static public let insertedDataKey = "<mbwInsertedDataKey>"
 
-    convenience init(accessToken: String) {
+    convenience public init(accessToken: String) {
         self.init()
         self.accessToken = accessToken
     }
     
-    func sendRequest(endpoint: String,
+    public func sendRequest(endpoint: String,
                      payload: Any!,
                      options: Dictionary<RequestOptions, Any>? = nil,
                      httpMethod: HTTPMethod,
@@ -177,7 +177,7 @@ class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDelegate 
     }
     
     // Redirects will strip our auth header. Re-add it here.
-    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+    public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         Logger.log(">>> redirecting: \(String(describing: request.url))")
         if request.allHTTPHeaderFields?["rToken"] != nil && request.allHTTPHeaderFields?["Authorization"] == nil {
             
@@ -246,7 +246,7 @@ class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDelegate 
 }
 
 extension URLRequest {
-    func printFullDescription() {
+    public func printFullDescription() {
         print("---")
         if let url = self.url, let method = self.httpMethod {
             print("\(method): \(url)")
@@ -266,7 +266,7 @@ extension URLRequest {
 }
 
 extension URL {
-    func appending(queryPairs: [URLQueryItem]) -> URL? {
+    public func appending(queryPairs: [URLQueryItem]) -> URL? {
         if queryPairs.isEmpty {
             return self
         } else {
@@ -285,11 +285,11 @@ extension URL {
     }
 }
 
-class MBWServerInterfaceError: NSError {
-    static let domain = "MBWServerInterfaceError"
-    static let httpDomain = "MBWServerInterfacHTTPErrorDomain"
+public class MBWServerInterfaceError: NSError {
+    static public let domain = "MBWServerInterfaceError"
+    static public let httpDomain = "MBWServerInterfacHTTPErrorDomain"
 
-    @objc(MBWServerInterfaceErrorCodes) enum Codes: Int {
+    @objc(MBWServerInterfaceErrorCodes) public enum Codes: Int {
         case unknown = 0
     }
 
@@ -299,12 +299,12 @@ class MBWServerInterfaceError: NSError {
         }
     }
     
-    convenience init(code: MBWServerInterfaceError.Codes) {
+    public convenience init(code: MBWServerInterfaceError.Codes) {
         let desc = MBWServerInterfaceError.descriptionForCode(code)
         self.init(domain: MBWServerInterfaceError.domain, code: code.rawValue, userInfo: [NSLocalizedDescriptionKey: desc])
     }
 
-    static func forHTTPStatus(_ status: Int, responseData: Data?) -> NSError {
+    static public func forHTTPStatus(_ status: Int, responseData: Data?) -> NSError {
         return NSError(domain: httpDomain, code: status, userInfo: [NSLocalizedDescriptionKey: "HTTP error: \(status)"])
     }
 
