@@ -98,40 +98,55 @@ extension Date {
     }
 }
 
-// usage: expr someDict.prettyPrint()
 extension Dictionary {
-    public func prettyPrint() {
+    
+    public var jsonStr: String? {
         if #available(iOS 13.0, *) {
             if let data = try? JSONSerialization.data(withJSONObject: self, options: [.prettyPrinted, .withoutEscapingSlashes]) {
-                print(String(data: data, encoding: .utf8) ?? "<error>")
+                return String(data: data, encoding: .utf8)
             } else {
-                print("<error>")
+                return nil
             }
         } else {
             if let data = try? JSONSerialization.data(withJSONObject: self, options: [.prettyPrinted]) {
-                print(String(data: data, encoding: .utf8) ?? "<error>")
+                return String(data: data, encoding: .utf8)
             } else {
-                print("<error>")
+                return nil
             }
+        }
+    }
+    
+    public func prettyPrint() {
+        if let str = self.jsonStr {
+            print(str)
+        } else {
+            print("<error>")
         }
     }
 }
 
-// usage: expr someArray.prettyPrint()
 extension Array {
-    public func prettyPrint() {
+    public var jsonStr: String? {
         if #available(iOS 13.0, *) {
             if let data = try? JSONSerialization.data(withJSONObject: self, options: [.prettyPrinted, .withoutEscapingSlashes]) {
-                print(String(data: data, encoding: .utf8) ?? "<error>")
+                return String(data: data, encoding: .utf8)
             } else {
-                print("<error>")
+                return nil
             }
         } else {
             if let data = try? JSONSerialization.data(withJSONObject: self, options: [.prettyPrinted]) {
-                print(String(data: data, encoding: .utf8) ?? "<error>")
+                return String(data: data, encoding: .utf8)
             } else {
-                print("<error>")
+                return nil
             }
+        }
+    }
+
+    public func prettyPrint() {
+        if let str = self.jsonStr {
+            print(str)
+        } else {
+            print("<error>")
         }
     }
 }
