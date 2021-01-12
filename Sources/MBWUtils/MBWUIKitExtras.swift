@@ -379,7 +379,7 @@ extension UIScrollView {
         }
     }
     
-    func recenterForScale(_ scale: CGFloat) {
+    public func recenterForScale(_ scale: CGFloat) {
         // Keep the scroll content centered while zooming or resizing. This is worked out by seeing that while scaling the graph, the viewable area (scrollView.bounds) remains fixed while the total width (scrollView.contentSize) and offset (scrollView.contentOffset) change. We can keep the center fixed by scaling the content offset with a fixed ratio, where the ratio is:
         //
         // r = offset / (contentWidth - boundsWidth)
