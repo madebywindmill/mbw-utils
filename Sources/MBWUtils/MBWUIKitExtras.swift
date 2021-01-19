@@ -120,6 +120,64 @@ extension UIFont {
 }
 
 extension UIColor {
+    public var hex3String: String {
+       let components = self.cgColor.components
+       let r: CGFloat = components?[0] ?? 0.0
+       let g: CGFloat = components?[1] ?? 0.0
+       let b: CGFloat = components?[2] ?? 0.0
+
+       let hexString = String.init(format: "%02lX%02lX%02lX", lroundf(Float(r * 255)), lroundf(Float(g * 255)), lroundf(Float(b * 255)))
+       return hexString
+    }
+    
+    public convenience init(hex3: Int) {
+        let r = CGFloat((hex3 >> 16) & 0xff)/255.0
+        let g = CGFloat((hex3 >> 8) & 0xff)/255.0
+        let b = CGFloat(hex3 & 0xff)/255.0
+        self.init(red: r, green: g, blue: b, alpha: 1)
+    }
+    
+    public convenience init(hex3String: String) {
+        var hexInt: UInt64 = 0
+        let scanner: Scanner = Scanner(string: hex3String)
+        scanner.scanHexInt64(&hexInt)
+        let int = Int(hexInt)
+        self.init(hex3: int)
+    }
+    
+    public var hex4String: String {
+       let components = self.cgColor.components
+       let r: CGFloat = components?[0] ?? 0.0
+       let g: CGFloat = components?[1] ?? 0.0
+       let b: CGFloat = components?[2] ?? 0.0
+       let a: CGFloat = components?[3] ?? 0.0
+
+        let hexString = String.init(format: "%02lX%02lX%02lX%02lX", lroundf(Float(r * 255)), lroundf(Float(g * 255)), lroundf(Float(b * 255)), lroundf(Float(a * 255)))
+       return hexString
+    }
+
+    public convenience init(hex4: Int) {
+        let r = CGFloat((hex4 >> 24) & 0xff)/255.0
+        let g = CGFloat((hex4 >> 16) & 0xff)/255.0
+        let b = CGFloat((hex4 >> 8) & 0xff)/255.0
+        let a = CGFloat(hex4 & 0xff)/255.0
+        self.init(red: r, green: g, blue: b, alpha: a)
+    }
+
+    // CSS convention: RRGGBBAA
+    public convenience init(hex4String: String) {
+        var hexInt: UInt64 = 0
+        let scanner: Scanner = Scanner(string: hex4String)
+        scanner.scanHexInt64(&hexInt)
+        let int = Int(hexInt)
+        self.init(hex4: int)
+    }
+
+    public static func systemTintColor() -> UIColor {
+        return UIColor(red: 0.0, green: 0.478, blue: 1.0, alpha: 1.0)
+    }
+    
+    @available(*, deprecated, message: "Use hex3String instead")
     public var hexString: String {
        let components = self.cgColor.components
        let r: CGFloat = components?[0] ?? 0.0
@@ -130,6 +188,7 @@ extension UIColor {
        return hexString
     }
     
+    @available(*, deprecated, message: "Use UIColor(hex3:) instead")
     public static func colorFromHex(_ hex: Int) -> UIColor {
         let redPart = CGFloat((hex >> 16) & 0xff)/255.0
         let greenPart = CGFloat((hex >> 8) & 0xff)/255.0
@@ -137,16 +196,13 @@ extension UIColor {
         return UIColor(red: redPart, green: greenPart, blue: bluePart, alpha: 1.0)
     }
 
+    @available(*, deprecated, message: "Use UIColor(hex3String:) instead")
     public static func colorFromHexStr(_ hexStr: String) -> UIColor {
         var hexInt: UInt64 = 0
         let scanner: Scanner = Scanner(string: hexStr)
         scanner.scanHexInt64(&hexInt)
         let int = Int(hexInt)
         return colorFromHex(int)
-    }
-    
-    public static func systemTintColor() -> UIColor {
-        return UIColor(red: 0.0, green: 0.478, blue: 1.0, alpha: 1.0)
     }
 }
 
