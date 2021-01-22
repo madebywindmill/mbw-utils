@@ -173,6 +173,45 @@ extension UIColor {
         self.init(hex4: int)
     }
 
+    // Display P3 color profile support
+    
+    public convenience init(p3r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) {
+        self.init(displayP3Red: p3r, green: g, blue: b, alpha: a)
+    }
+    
+    public convenience init(p3hex3: Int) {
+        let r = CGFloat((p3hex3 >> 16) & 0xff)/255.0
+        let g = CGFloat((p3hex3 >> 8) & 0xff)/255.0
+        let b = CGFloat(p3hex3 & 0xff)/255.0
+        self.init(p3r: r, g, b)
+    }
+
+    public convenience init(p3hex3String: String) {
+        var hexInt: UInt64 = 0
+        let scanner: Scanner = Scanner(string: p3hex3String)
+        scanner.scanHexInt64(&hexInt)
+        let int = Int(hexInt)
+        self.init(p3hex3: int)
+    }
+
+    public convenience init(p3hex4: Int) {
+        let r = CGFloat((p3hex4 >> 24) & 0xff)/255.0
+        let g = CGFloat((p3hex4 >> 16) & 0xff)/255.0
+        let b = CGFloat((p3hex4 >> 8) & 0xff)/255.0
+        let a = CGFloat(p3hex4 & 0xff)/255.0
+        self.init(p3r: r, g, b, a)
+    }
+
+    public convenience init(p3hex4String: String) {
+        var hexInt: UInt64 = 0
+        let scanner: Scanner = Scanner(string: p3hex4String)
+        scanner.scanHexInt64(&hexInt)
+        let int = Int(hexInt)
+        self.init(p3hex4: int)
+    }
+
+    //
+    
     public static func systemTintColor() -> UIColor {
         return UIColor(red: 0.0, green: 0.478, blue: 1.0, alpha: 1.0)
     }
