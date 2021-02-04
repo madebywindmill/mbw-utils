@@ -11,7 +11,7 @@ import AppKit
 
 extension NSImage {
         
-    func resize(targetSizePx: CGSize) -> NSImage {
+    public func resize(targetSizePx: CGSize) -> NSImage {
         let size = self.size
         
         let widthRatio  = targetSizePx.width  / self.size.width
@@ -27,7 +27,7 @@ extension NSImage {
         return self.resize(newSize)
     }
     
-    func resize(_ newSize: NSSize) -> NSImage {
+    public func resize(_ newSize: NSSize) -> NSImage {
         let newImage = NSImage(size: newSize)
         newImage.lockFocus()
         NSGraphicsContext.current?.imageInterpolation = .high
