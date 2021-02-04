@@ -102,8 +102,15 @@ extension NSColor {
 }
 
 extension NSImage {
-        
-    public func resize(targetSizePx: CGSize) -> NSImage {
+    
+    public func jpegData(compressionQuality: CGFloat) -> Data? {
+        let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil)!
+        let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
+        return bitmapRep.representation(using: NSBitmapImageRep.FileType.jpeg, properties: [.compressionFactor:compressionQuality])
+    }
+    
+    // Returns optional to conform with UIImage.resize(targetSizePx:)
+    public func resize(targetSizePx: CGSize) -> NSImage? {
         let size = self.size
         
         let widthRatio  = targetSizePx.width  / self.size.width
@@ -119,7 +126,8 @@ extension NSImage {
         return self.resize(newSize)
     }
     
-    public func resize(_ newSize: NSSize) -> NSImage {
+    // Returns optional to conform with UIImage.resize()
+    public func resize(_ newSize: NSSize) -> NSImage? {
         let newImage = NSImage(size: newSize)
         newImage.lockFocus()
         NSGraphicsContext.current?.imageInterpolation = .high
