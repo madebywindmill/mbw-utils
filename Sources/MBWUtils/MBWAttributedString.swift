@@ -9,6 +9,8 @@
 // someLabel.attributedText = attrStr.bold("some bold text") + attrStr.norm(" some normal text")
 //
 
+#if os(iOS)
+
 import UIKit
 
 public class MBWAttributedString {
@@ -154,3 +156,5 @@ extension NSMutableAttributedString {
         endEditing()
     }
 }
+
+#endif

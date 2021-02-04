@@ -5,6 +5,8 @@
 //  Copyright © 2018-2021 Made by Windmill. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 extension UIApplication {
@@ -972,3 +974,5 @@ public class NoAutoScrollingScrollView: UIScrollView {
         return
     }
 }
+
+#endif

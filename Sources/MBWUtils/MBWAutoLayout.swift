@@ -46,7 +46,7 @@ extension View {
         self.autoResizeTranslationCheck()
         self.constrainToEdgesOf(self.superview!, offset: offset, activate: activate)
     }
-    public func constrainToEdgesOf(_ view: UIView, offset:CGFloat = 0, activate: Bool = true) {
+    public func constrainToEdgesOf(_ view: View, offset:CGFloat = 0, activate: Bool = true) {
         self.autoResizeTranslationCheck()
         self.leftAnchor.constraint(equalTo: view.leftAnchor, constant: offset).isActive = activate
         self.rightAnchor.constraint(equalTo: view.rightAnchor, constant: offset * -1).isActive = activate

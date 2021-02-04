@@ -5,6 +5,8 @@
 //  Copyright © 2018-2021 Made by Windmill. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 public class AlertController : UIAlertController {
@@ -66,4 +68,4 @@ public class AlertController : UIAlertController {
     
 }
 
-
+#endif
