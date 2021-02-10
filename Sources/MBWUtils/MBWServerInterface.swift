@@ -25,6 +25,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         case nonMainCompletion = "nonMainCompletion" // Completions are sent on the main thread by default. If you don't want that, set this.
         case formEncodeData = "formEncodeData"
         case customBaseURL = "customBaseURL" // overrides self.baseURL
+        case overrideURL = "overrideURL" // will be used instead of prescribed endpoint
         case none = "none"
     }
     
@@ -81,7 +82,10 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
 
         // Set up the URL
         var url: URL?
-        if let customBaseURL = unwrappedOptions[.customBaseURL] as? URL {
+        
+        if let overrideURL = unwrappedOptions[.overrideURL] as? URL {
+            url = overrideURL
+        } else if let customBaseURL = unwrappedOptions[.customBaseURL] as? URL {
             url = (customBaseURL as NSURL).appendingPathComponent(endpoint)
         } else {
             url = (self.baseURL as NSURL).appendingPathComponent(endpoint)
