@@ -404,17 +404,9 @@ extension UIView {
     
     public func recursiveSubviews() -> [UIView] {
         var views = [UIView]()
-        
         views.append(self)
-        
-        if let sv = self as? UIStackView {
-            for next in sv.arrangedSubviews {
-                views += next.recursiveSubviews()
-            }
-        } else {
-            for next in subviews {
-                views += next.recursiveSubviews()
-            }
+        for next in subviews {
+            views += next.recursiveSubviews()
         }
         return views
     }
