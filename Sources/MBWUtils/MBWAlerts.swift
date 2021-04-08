@@ -13,7 +13,8 @@ public class AlertController : UIAlertController {
     public class func showSimpleAlert(title: String,
                                       message: String,
                                       tintColor: UIColor? = nil,
-                                      vc: UIViewController, completion: (() -> Void)? = nil) {
+                                      vc: UIViewController,
+                                      completion: (() -> Void)? = nil) {
         let alert = AlertController(title: title, message: message, preferredStyle: .alert)
         
         if let tintColor = tintColor {
@@ -30,14 +31,30 @@ public class AlertController : UIAlertController {
         vc.present(alert, animated: true)
     }
     
-    public class func showErrorAlert(title: String, error: Error, vc: UIViewController, completion: (() -> Void)? = nil) {
-        AlertController.showSimpleAlert(title: title, message: "\(error.localizedDescription) (\((error as NSError).code))", vc: vc) {
-            completion?()
-        }
+    public class func showErrorAlert(title: String,
+                                     error: Error,
+                                     tintColor: UIColor? = nil,
+                                     vc: UIViewController,
+                                     completion: (() -> Void)? = nil) {
+        
+        AlertController.showSimpleAlert(title: title,
+                                        message: "\(error.localizedDescription) (\((error as NSError).code))",
+                                        tintColor: tintColor,
+                                        vc: vc,
+                                        completion: completion)
     }
     
-    public class func showBlockingAlertWithSpinner(title: String, allowCancel: Bool = false, vc: UIViewController, cancelBlock: (()->Void)? = nil) -> AlertController {
+    public class func showBlockingAlertWithSpinner(title: String,
+                                                   allowCancel: Bool = false,
+                                                   tintColor: UIColor? = nil,
+                                                   vc: UIViewController,
+                                                   cancelBlock: (()->Void)? = nil) -> AlertController {
         let alert = AlertController(title: title + "\n\n\n", message: nil, preferredStyle: .alert)
+
+        if let tintColor = tintColor {
+            alert.view.tintColor = tintColor
+        }
+
         if allowCancel {
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
                 cancelBlock?()
