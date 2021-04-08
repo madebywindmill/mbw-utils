@@ -10,8 +10,15 @@
 import UIKit
 
 public class AlertController : UIAlertController {
-    public class func showSimpleAlert(title: String, message: String, vc: UIViewController, completion: (() -> Void)? = nil) {
+    public class func showSimpleAlert(title: String,
+                                      message: String,
+                                      tintColor: UIColor? = nil,
+                                      vc: UIViewController, completion: (() -> Void)? = nil) {
         let alert = AlertController(title: title, message: message, preferredStyle: .alert)
+        
+        if let tintColor = tintColor {
+            alert.view.tintColor = tintColor
+        }
         
         if completion == nil {
             alert.addAction(UIAlertAction(title: "OK", style: .default))
