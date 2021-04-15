@@ -167,7 +167,8 @@ extension Data {
         do {
             jsonDict = try JSONSerialization.jsonObject(with: self, options: JSONSerialization.ReadingOptions(rawValue: 0)) as? Dictionary<String,AnyObject>
         } catch {
-            print("JSON error: \(error)")
+            // These logs can be too much when this occurs commonly
+//            print("JSON error: \(error)")
         }
         
         return jsonDict
@@ -178,7 +179,8 @@ extension Data {
         do {
             array = try JSONSerialization.jsonObject(with: self, options: JSONSerialization.ReadingOptions(rawValue: 0)) as? Array<Any>
         } catch {
-            print("JSON error: \(error)")
+            // These logs can be too much when this occurs commonly
+//            print("JSON error: \(error)")
         }
         
         return array
