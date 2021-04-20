@@ -10,6 +10,9 @@
 import UIKit
 
 public class AlertController : UIAlertController {
+
+    static public var defaultTintColor: UIColor?
+    
     public class func showSimpleAlert(title: String,
                                       message: String,
                                       tintColor: UIColor? = nil,
@@ -18,6 +21,8 @@ public class AlertController : UIAlertController {
         let alert = AlertController(title: title, message: message, preferredStyle: .alert)
         
         if let tintColor = tintColor {
+            alert.view.tintColor = tintColor
+        } else if let tintColor = AlertController.defaultTintColor {
             alert.view.tintColor = tintColor
         }
         
@@ -52,6 +57,8 @@ public class AlertController : UIAlertController {
         let alert = AlertController(title: title + "\n\n\n", message: nil, preferredStyle: .alert)
 
         if let tintColor = tintColor {
+            alert.view.tintColor = tintColor
+        } else if let tintColor = AlertController.defaultTintColor {
             alert.view.tintColor = tintColor
         }
 
