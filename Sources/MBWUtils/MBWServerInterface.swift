@@ -324,6 +324,8 @@ public class MBWServerInterfaceFormData {
     var formData = NSMutableData()
     let formBoundary = "Boundary-\(UUID().uuidString)"
     
+    public init() {}
+
     public func addField(name: String, value: Any) {
         var fieldString = "--\(formBoundary)\r\n"
         fieldString += "Content-Disposition: form-data; name=\"\(name)\"\r\n"
