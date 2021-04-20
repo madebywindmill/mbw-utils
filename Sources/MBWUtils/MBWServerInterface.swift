@@ -26,6 +26,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         case formEncodeData = "formEncodeData"
         case customBaseURL = "customBaseURL" // overrides self.baseURL
         case overrideURL = "overrideURL" // will be used instead of prescribed endpoint
+        case skipAuthHeader = "skipAuthHeader" // won't set Authorization header when set
         case none = "none"
     }
     
@@ -108,11 +109,16 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         request.httpMethod = httpMethod.rawValue
         
         // Add auth (basic, bearer, or none)
-        serverInterfaceAddAuthHeaders(request: &request)
+        if unwrappedOptions[.skipAuthHeader] == nil {
+            serverInterfaceAddAuthHeaders(request: &request)
+        }
         
         // Add the payload, if any
         if unwrappedOptions[.formEncodeData] != nil {
             self.addFormEncodedBody(payload: payload, request: &request)
+        } else if let formData = payload as? MBWServerInterfaceFormData  {
+            request.httpBody = formData.formData as Data
+            request.addValue("multipart/form-data; boundary=\(formData.formBoundary)", forHTTPHeaderField: "Content-Type")
         } else {
             self.addJSONBody(payload: payload, request: &request)
         }
@@ -314,17 +320,58 @@ extension URL {
     }
 }
 
+public class MBWServerInterfaceFormData {
+    var formData = NSMutableData()
+    let formBoundary = "Boundary-\(UUID().uuidString)"
+    
+    public func addField(name: String, value: Any) {
+        var fieldString = "--\(formBoundary)\r\n"
+        fieldString += "Content-Disposition: form-data; name=\"\(name)\"\r\n"
+        fieldString += "\r\n"
+        fieldString += "\(value)\r\n"
+
+        formData.appendString(fieldString)
+    }
+    
+    public func addFile(fileName: String, fieldName: String, mimeType: String, fileData: Data) {
+        let data = NSMutableData()
+        
+        data.appendString("--\(formBoundary)\r\n")
+        data.appendString("Content-Disposition: form-data; name=\"\(fieldName)\"; filename=\"\(fileName)\"\r\n")
+        data.appendString("Content-Type: \(mimeType)\r\n\r\n")
+        data.append(fileData)
+        data.appendString("\r\n")
+        
+        formData.append(data as Data)
+    }
+    
+    public func close() {
+        formData.appendString("--\(formBoundary)--")
+    }
+}
+
+public extension NSMutableData {
+    func appendString(_ string: String) {
+        if let data = string.data(using: .utf8) {
+            self.append(data)
+        } else {
+            assertionFailure()
+        }
+    }
+}
+
 public class MBWServerInterfaceError: NSError {
     static public let domain = "MBWServerInterfaceError"
     static public let httpDomain = "MBWServerInterfacHTTPErrorDomain"
 
     @objc(MBWServerInterfaceErrorCodes) public enum Codes: Int {
-        case unknown = 0
+        case unknown, invalidConfiguration
     }
 
     static private func descriptionForCode(_ code: Codes) -> String {
         switch code {
-        case .unknown: return "Unknown"
+            case .unknown: return "Unknown"
+            case .invalidConfiguration: return "Invalid Configuration"
         }
     }
     
