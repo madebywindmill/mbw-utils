@@ -22,21 +22,30 @@ public class MBWAttributedString {
     public var normAttrs: [NSAttributedString.Key : Any] = [NSAttributedString.Key.font : Font.systemFont(ofSize: 15.0, weight: .regular)]
     public var boldAttrs: [NSAttributedString.Key : Any] = [NSAttributedString.Key.font : Font.systemFont(ofSize: 15.0, weight: .bold)]
     public var lightAttrs: [NSAttributedString.Key : Any] = [NSAttributedString.Key.font : Font.systemFont(ofSize: 15.0, weight: .light)]
+    public var other1Attrs: [NSAttributedString.Key : Any] = [:]
+    public var other2Attrs: [NSAttributedString.Key : Any] = [:]
+    public var other3Attrs: [NSAttributedString.Key : Any] = [:]
 
     public var attributedString = NSMutableAttributedString()
     
     public func norm(_ str: String) -> NSMutableAttributedString {
         return NSMutableAttributedString(string: str, attributes: self.normAttrs)
     }
-
     public func bold(_ str: String) -> NSMutableAttributedString {
         return NSMutableAttributedString(string: str, attributes: self.boldAttrs)
     }
-
     public func light(_ str: String) -> NSMutableAttributedString {
         return NSMutableAttributedString(string: str, attributes: self.lightAttrs)
     }
-
+    public func other1(_ str: String) -> NSMutableAttributedString {
+        return NSMutableAttributedString(string: str, attributes: self.other1Attrs)
+    }
+    public func other2(_ str: String) -> NSMutableAttributedString {
+        return NSMutableAttributedString(string: str, attributes: self.other2Attrs)
+    }
+    public func other3(_ str: String) -> NSMutableAttributedString {
+        return NSMutableAttributedString(string: str, attributes: self.other3Attrs)
+    }
 }
 
 extension String {
