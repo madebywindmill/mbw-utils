@@ -74,7 +74,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
                 actualCompletion = completion
             } else {
                 actualCompletion = {(jsonDictionary, response, error) in
-                    DispatchQueue.main.async {
+                    mainAsync {
                         completion!(jsonDictionary, response, error)
                     }
                 }

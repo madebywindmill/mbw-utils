@@ -553,7 +553,7 @@ extension UIImageView {
         self.image = self.image?.withRenderingMode(.alwaysTemplate)
     }
     public func setImage(_ image: UIImage?, animatingWithDuration: TimeInterval) {
-        DispatchQueue.main.async {
+        mainAsync {
             UIView.transition(with: self, duration: 0.3, options: .transitionCrossDissolve, animations: {
                 self.image = image
             }, completion: nil)
