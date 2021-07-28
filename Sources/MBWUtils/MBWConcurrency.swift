@@ -43,6 +43,8 @@ public class ParallelAsync {
     private var group = DispatchGroup()
     private var blocks = [(()->Void)]()
     
+    public init() { }
+    
     public func add(_ block: @escaping (()->Void)) {
         blocks.append(block)
     }
