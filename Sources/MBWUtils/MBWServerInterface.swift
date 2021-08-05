@@ -9,10 +9,12 @@ import Foundation
 
 let serverInterfaceAPITimeout = 90.0
 
+public typealias JSONObject = [String:Any]
+
 open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDelegate {
     
     public typealias RequestCompletionHandler = (
-        _ jsonDictionary: Dictionary<String,Any>?,
+        _ jsonDictionary: JSONObject?,
         _ response: HTTPURLResponse?,
         _ error: NSError?
         ) -> Void
@@ -147,7 +149,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
             
             self.debugLog(">>> \(httpResponse.statusCode) returned for \(request.url!)")
             
-            var jsonDict: [String:Any]?
+            var jsonDict: JSONObject?
             if let data = data {
                 jsonDict = data.jsonToDict()
                 if jsonDict == nil {
@@ -223,7 +225,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
     }
     
     private func addFormEncodedBody(payload: Any!, request: inout URLRequest) {
-        guard let dict = payload as? Dictionary<String,Any> else {
+        guard let dict = payload as? JSONObject else {
             Logger.fileLog("*** couldn't cast payload as dictionary")
             return
         }
