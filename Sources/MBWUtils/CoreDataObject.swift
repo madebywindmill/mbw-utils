@@ -16,6 +16,10 @@ open class CoreDataObject: NSManagedObject {
         return "<undefined>"
     }
     
+    open class var entity: NSEntityDescription? {
+        return CoreDataManager.current.entity(name: Self.entityName)
+    }
+    
     /// **WARNING**: brings entire object graph into memory. For debugging use only.
     open var coreDataAttrs: String {
         var str = String()
