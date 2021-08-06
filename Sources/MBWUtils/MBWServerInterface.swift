@@ -20,6 +20,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         ) -> Void
 
     public typealias BasicCompletionHandler = (_ error: NSError?) -> Void
+    public typealias BasicErrorCompletionHandler = (_ error: Error?) -> Void
 
     public enum RequestOptions: String {
         case queryPairs = "queryPairs"
