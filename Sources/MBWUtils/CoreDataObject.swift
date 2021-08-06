@@ -8,6 +8,11 @@ import Foundation
 import CoreData
 
 /// An abstract super class for Core Data objects.
+///
+/// Your app's Core Data model file should list one `CoreDataObject` entity that's:
+/// * Marked "abstract entity"
+/// * Has the class module set to "MBWUtils"
+/// * Has codegen set to "Manual/None"
 open class CoreDataObject: NSManagedObject {
     
     @NSManaged open var id: IDType
@@ -16,19 +21,18 @@ open class CoreDataObject: NSManagedObject {
         return "<undefined>"
     }
     
-    open class var entity: NSEntityDescription? {
-        return CoreDataManager.current.entity(name: Self.entityName)
-    }
-    
     /// **WARNING**: brings entire object graph into memory. For debugging use only.
     open var coreDataAttrs: String {
         var str = String()
         
-        guard let entityName = CoreDataManager.current.entityNameForClass(type(of: self)) else { return "" }
+        guard let entityName = Self.entity().name else {
+            Logger.fileLog("*** Entity name was nil")
+            return ""
+        }
         
         str.append("--\nEntity: \(entityName)\n\n")
-        for (key,_) in self.entity.attributesByName {
-            let currentValue = self.value(forKey: key)
+        for (key,_) in entity.attributesByName {
+            let currentValue = value(forKey: key)
             str.append("\(key): \(currentValue ?? "nil")\n")
         }
         
@@ -38,7 +42,7 @@ open class CoreDataObject: NSManagedObject {
     }
     
     open var isPersisted: Bool {
-        return !self.objectID.isTemporaryID
+        return !objectID.isTemporaryID
     }
     
     
@@ -46,7 +50,8 @@ open class CoreDataObject: NSManagedObject {
     /// - Parameter id: ID of the object to fetch
     /// - Returns: The found object
     open class func fetch(id: IDType) -> Self? {
-        guard let entityName = CoreDataManager.current.entityNameForClass(self) else {
+        guard let entityName = entity().name else {
+            Logger.fileLog("*** Entity name was nil")
             return nil
         }
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
@@ -74,7 +79,7 @@ open class CoreDataObject: NSManagedObject {
         assert(Thread.isMainThread)
         let managedObject: CoreDataObject
         var wasCreated = false
-        if let existing = Self.fetch(id: self.id) {
+        if let existing = Self.fetch(id: id) {
             CoreDataManager.current.update(managedObject: existing, with: self)
             managedObject = existing
         } else {

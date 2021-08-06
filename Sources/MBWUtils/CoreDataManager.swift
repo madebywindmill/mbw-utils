@@ -17,21 +17,14 @@ public typealias IDType = String
  * It uses sqlite as the backing store
  
  `CoreDataManager` and `CoreDataObject` work together so all entities managed through `CoreDataManager` should be subclasses of  `CoreDataObject`.
- 
- After instantiating a `CoreDataManager`, register each your model classes like so:
- ```swift
- dm.register(class: Account.self, entityName: "Account")
- ```
- */
+*/
 public class CoreDataManager {
     
     // For convenience, assuming there's only ever one in the app
     public static var current: CoreDataManager!
     
     public var mainContext: NSManagedObjectContext!
-    
-    private var classEntityRegistry = [String:String]() // key = class string, val = entity name
-    
+        
     /// Instantiate a CoreDataManager.
     /// - Parameter modelName: the name of the CoreData model resource file
     /// - Parameter dbName: the name to use for the sqlite database stored on disk
@@ -67,26 +60,6 @@ public class CoreDataManager {
         CoreDataManager.current = self
     }
     
-    /// Look up the registered entity name for a model class
-    /// - Parameter class: The class of a previously registered model
-    /// - Returns: The entity name of that model class
-    public func entityNameForClass(_ class: CoreDataObject.Type) -> String! {
-        let classStr = "\(`class`)"
-        return classEntityRegistry[classStr]
-    }
-    
-    /// Create and return a CD entity
-    /// - Parameter name: The name of a previously registered CD entity
-    /// - Returns: An NSEntityDescription in the NSManagedObjectContext
-    public func entity(name: String) -> NSEntityDescription? {
-        return NSEntityDescription.entity(forEntityName: name, in: self.mainContext)
-    }
-    
-    public func register(class: CoreDataObject.Type, entityName: String) {
-        let classStr = "\(`class`)"
-        classEntityRegistry[classStr] = entityName
-    }
-    
     /// Update an object in the store
     /// - Parameters:
     ///   - managedObject: The object currently in the store to be updated
@@ -104,8 +77,8 @@ public class CoreDataManager {
     ///   - managedObject: The object currently in the store to be replaced
     ///   - newObject: The object to replace it with
     public func replace(managedObject: NSManagedObject, with newObject: NSManagedObject) {
-        self.mainContext.delete(managedObject)
-        do { try self.mainContext.save() } catch {
+        mainContext.delete(managedObject)
+        do { try mainContext.save() } catch {
             Logger.fileLog("*** Caught: \(error)")
         }
     }
@@ -115,7 +88,7 @@ public class CoreDataManager {
     @discardableResult public func save() -> Error? {
         assert(Thread.isMainThread)
         do {
-            try self.mainContext.save()
+            try mainContext.save()
         } catch {
             Logger.fileLog("*** failure to save context: \(error)")
             return error
@@ -125,9 +98,17 @@ public class CoreDataManager {
     
     /// Print all objects in the store to console. **WARNING**: brings entire object graph into memory. For debugging use only.
     public func printAllObjects() {
-        for nextEntityName in classEntityRegistry.values {
+        guard let model = mainContext.persistentStoreCoordinator?.managedObjectModel else {
+            Logger.fileLog("*** persistentStoreCoordinator was nil")
+            return
+        }
+        for nextEntityName in model.entities.compactMap({ $0.name }) {
+            if nextEntityName == "CoreDataObject" {
+                // Skip the abstract superclass since it's redundant
+                continue
+            }
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: nextEntityName)
-            if let results = try? self.mainContext.fetch(fetchRequest) {
+            if let results = try? mainContext.fetch(fetchRequest) {
                 for next in results {
                     if let o = next as? CoreDataObject {
                         print(o.coreDataAttrs)
@@ -138,15 +119,15 @@ public class CoreDataManager {
             }
         }
     }
-    
+
     /// Use with extreme care. Deleting objects with remaining references from other objects will result in an exception. Further, all relationship entities that these objects reference will also be deleted.
     /// - Parameter entityName: The name of the entity for which all objects are to be deleted
     public func deleteAllObjects(entityName: String) {
         let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
         let request = NSBatchDeleteRequest(fetchRequest: fetch)
         do {
-            try self.mainContext.execute(request)
-            if let error = self.save() {
+            try mainContext.execute(request)
+            if let error = save() {
                 throw(error)
             }
         } catch {
@@ -156,9 +137,7 @@ public class CoreDataManager {
     
     /// Use with extreme care. For debugging/tests purposes only.
     public func deleteAll() {
-        for nextEntityName in classEntityRegistry.values {
-            self.deleteAllObjects(entityName: nextEntityName)
-        }
-        self.mainContext.reset()
+        deleteAllObjects(entityName: "CoreDataObject")
+        mainContext.reset()
     }
 }
