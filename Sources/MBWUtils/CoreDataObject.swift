@@ -98,7 +98,7 @@ open class CoreDataObject: NSManagedObject {
     /// Delete this object from the store and optionally save the context.
     /// - Parameter saveContext: Whether to save the context after inserting. When updating many objects one after the other, set to false and save the context when finished.
     /// - Returns: An optional error.
-    @discardableResult open func delete(saveContext: Bool = true) -> Error? {
+    @discardableResult open func deleteObject(saveContext: Bool = true) -> Error? {
         assert(Thread.isMainThread)
         CoreDataManager.current.mainContext.delete(self)
         if saveContext {
