@@ -9,7 +9,7 @@ import Foundation
 
 extension Date {
     
-    static public func fromISO8601String(str: String) -> Date {
+    static public func fromISO8601String(str: String) -> Date? {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -33,7 +33,7 @@ extension Date {
         
         // Try with no time zone, no fractional seconds
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        return formatter.date(from: str)!
+        return formatter.date(from: str)
     }
     
     public func ISO8601String() -> String {
