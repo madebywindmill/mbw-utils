@@ -82,7 +82,7 @@ public class CoreDataManager {
         return NSEntityDescription.entity(forEntityName: name, in: self.mainContext)
     }
     
-    private func register(class: CoreDataObject.Type, entityName: String) {
+    public func register(class: CoreDataObject.Type, entityName: String) {
         let classStr = "\(`class`)"
         classEntityRegistry[classStr] = entityName
     }
