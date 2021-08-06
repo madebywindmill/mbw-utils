@@ -181,7 +181,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
                     }
                 }
                 
-                actualCompletion?(jsonDict, httpResponse, MBWServerInterfaceError.forHTTPStatus(httpResponse.statusCode, responseData: data))
+                actualCompletion?(jsonDict, httpResponse, MBWServerInterfaceError.forHTTPStatus(httpResponse.statusCode))
                 return
             }
             
@@ -385,7 +385,7 @@ public class MBWServerInterfaceError: NSError {
         self.init(domain: MBWServerInterfaceError.domain, code: code.rawValue, userInfo: [NSLocalizedDescriptionKey: desc])
     }
 
-    static public func forHTTPStatus(_ status: Int, responseData: Data?) -> NSError {
+    static public func forHTTPStatus(_ status: Int) -> NSError {
         return NSError(domain: httpDomain, code: status, userInfo: [NSLocalizedDescriptionKey: "HTTP error: \(status)"])
     }
 
