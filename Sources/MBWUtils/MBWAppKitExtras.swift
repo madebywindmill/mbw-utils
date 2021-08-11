@@ -9,8 +9,8 @@
 
 import AppKit
 
-extension NSColor {
-    public var hex3String: String {
+public extension NSColor {
+    var hex3String: String {
        let components = self.cgColor.components
        let r: CGFloat = components?[0] ?? 0.0
        let g: CGFloat = components?[1] ?? 0.0
@@ -20,14 +20,14 @@ extension NSColor {
        return hexString
     }
     
-    public convenience init(hex3: Int) {
+    convenience init(hex3: Int) {
         let r = CGFloat((hex3 >> 16) & 0xff)/255.0
         let g = CGFloat((hex3 >> 8) & 0xff)/255.0
         let b = CGFloat(hex3 & 0xff)/255.0
         self.init(red: r, green: g, blue: b, alpha: 1)
     }
     
-    public convenience init(hex3String: String) {
+    convenience init(hex3String: String) {
         var hexInt: UInt64 = 0
         let scanner: Scanner = Scanner(string: hex3String)
         scanner.scanHexInt64(&hexInt)
@@ -35,7 +35,7 @@ extension NSColor {
         self.init(hex3: int)
     }
     
-    public var hex4String: String {
+    var hex4String: String {
        let components = self.cgColor.components
        let r: CGFloat = components?[0] ?? 0.0
        let g: CGFloat = components?[1] ?? 0.0
@@ -46,7 +46,7 @@ extension NSColor {
        return hexString
     }
 
-    public convenience init(hex4: Int) {
+    convenience init(hex4: Int) {
         let r = CGFloat((hex4 >> 24) & 0xff)/255.0
         let g = CGFloat((hex4 >> 16) & 0xff)/255.0
         let b = CGFloat((hex4 >> 8) & 0xff)/255.0
@@ -55,7 +55,7 @@ extension NSColor {
     }
 
     // CSS convention: RRGGBBAA
-    public convenience init(hex4String: String) {
+    convenience init(hex4String: String) {
         var hexInt: UInt64 = 0
         let scanner: Scanner = Scanner(string: hex4String)
         scanner.scanHexInt64(&hexInt)
@@ -65,18 +65,18 @@ extension NSColor {
 
     // Display P3 color profile support
     
-    public convenience init(p3r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) {
+    convenience init(p3r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) {
         self.init(displayP3Red: p3r, green: g, blue: b, alpha: a)
     }
     
-    public convenience init(p3hex3: Int) {
+    convenience init(p3hex3: Int) {
         let r = CGFloat((p3hex3 >> 16) & 0xff)/255.0
         let g = CGFloat((p3hex3 >> 8) & 0xff)/255.0
         let b = CGFloat(p3hex3 & 0xff)/255.0
         self.init(p3r: r, g, b)
     }
 
-    public convenience init(p3hex3String: String) {
+    convenience init(p3hex3String: String) {
         var hexInt: UInt64 = 0
         let scanner: Scanner = Scanner(string: p3hex3String)
         scanner.scanHexInt64(&hexInt)
@@ -84,7 +84,7 @@ extension NSColor {
         self.init(p3hex3: int)
     }
 
-    public convenience init(p3hex4: Int) {
+    convenience init(p3hex4: Int) {
         let r = CGFloat((p3hex4 >> 24) & 0xff)/255.0
         let g = CGFloat((p3hex4 >> 16) & 0xff)/255.0
         let b = CGFloat((p3hex4 >> 8) & 0xff)/255.0
@@ -92,7 +92,7 @@ extension NSColor {
         self.init(p3r: r, g, b, a)
     }
 
-    public convenience init(p3hex4String: String) {
+    convenience init(p3hex4String: String) {
         var hexInt: UInt64 = 0
         let scanner: Scanner = Scanner(string: p3hex4String)
         scanner.scanHexInt64(&hexInt)
@@ -101,16 +101,16 @@ extension NSColor {
     }
 }
 
-extension NSImage {
+public extension NSImage {
     
-    public func jpegData(compressionQuality: CGFloat) -> Data? {
+    func jpegData(compressionQuality: CGFloat) -> Data? {
         let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil)!
         let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
         return bitmapRep.representation(using: NSBitmapImageRep.FileType.jpeg, properties: [.compressionFactor:compressionQuality])
     }
     
     // Returns optional to conform with UIImage.resize(targetSizePx:)
-    public func resize(targetSizePx: CGSize) -> NSImage? {
+    func resize(targetSizePx: CGSize) -> NSImage? {
         let size = self.size
         
         let widthRatio  = targetSizePx.width  / self.size.width
@@ -127,7 +127,7 @@ extension NSImage {
     }
     
     // Returns optional to conform with UIImage.resize()
-    public func resize(_ newSize: NSSize) -> NSImage? {
+    func resize(_ newSize: NSSize) -> NSImage? {
         let newImage = NSImage(size: newSize)
         newImage.lockFocus()
         NSGraphicsContext.current?.imageInterpolation = .high

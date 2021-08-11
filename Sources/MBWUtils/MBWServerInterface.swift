@@ -278,7 +278,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
     }
 }
 
-extension URLRequest {
+public extension URLRequest {
     func fullDescription() -> String {
         var s = "\n---\n"
         if let url = self.url, let method = self.httpMethod {
@@ -303,8 +303,8 @@ extension URLRequest {
     }
 }
 
-extension URL {
-    public func appending(queryPairs: [URLQueryItem]) -> URL? {
+public extension URL {
+    func appending(queryPairs: [URLQueryItem]) -> URL? {
         if queryPairs.isEmpty {
             return self
         } else {

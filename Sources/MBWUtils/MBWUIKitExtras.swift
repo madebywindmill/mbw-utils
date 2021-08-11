@@ -9,8 +9,8 @@
 
 import UIKit
 
-extension UIApplication {
-    public var icon: UIImage? {
+public extension UIApplication {
+    var icon: UIImage? {
         guard let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? NSDictionary,
             let primaryIconsDictionary = iconsDictionary["CFBundlePrimaryIcon"] as? NSDictionary,
             let iconFiles = primaryIconsDictionary["CFBundleIconFiles"] as? NSArray,
@@ -31,8 +31,8 @@ public class SFSymbolsFixButton: UIButton {
     }
 }
 
-extension UIDevice {
-    public var modelID: String {
+public extension UIDevice {
+    var modelID: String {
         get {
             var systemInfo = utsname()
             uname(&systemInfo)
@@ -51,12 +51,12 @@ extension UIDevice {
     }
 }
 
-extension UIButton {
-    public func fixScalingIssueWithSFSymbols() {
+public extension UIButton {
+    func fixScalingIssueWithSFSymbols() {
         imageView?.contentMode = .scaleAspectFit
     }
     
-    public func setTitle(_ title: String?, for state: UIControl.State, animated: Bool = false) {
+    func setTitle(_ title: String?, for state: UIControl.State, animated: Bool = false) {
         if !animated {
             UIView.setAnimationsEnabled(false)
         }
@@ -68,7 +68,7 @@ extension UIButton {
         }
     }
     
-    public func setAttributedTitle(_ title: NSAttributedString?, for state: UIControl.State, animated: Bool = false) {
+    func setAttributedTitle(_ title: NSAttributedString?, for state: UIControl.State, animated: Bool = false) {
         if !animated {
             UIView.setAnimationsEnabled(false)
         }
@@ -83,24 +83,24 @@ extension UIButton {
 
 }
 
-extension UIFont {
-    public var weight: UIFont.Weight {
+public extension UIFont {
+    var weight: UIFont.Weight {
         guard let weightNumber = traits[.weight] as? NSNumber else { return .regular }
         let weightRawValue = CGFloat(weightNumber.doubleValue)
         let weight = UIFont.Weight(rawValue: weightRawValue)
         return weight
     }
 
-    public var traits: [UIFontDescriptor.TraitKey: Any] {
+    var traits: [UIFontDescriptor.TraitKey: Any] {
         return fontDescriptor.object(forKey: .traits) as? [UIFontDescriptor.TraitKey: Any]
             ?? [:]
     }
     
-    public func with(traits: UIFontDescriptor.SymbolicTraits) -> UIFont {
+    func with(traits: UIFontDescriptor.SymbolicTraits) -> UIFont {
         return UIFont(descriptor: self.fontDescriptor.withSymbolicTraits(traits)!, size: self.pointSize)
     }
 
-    public func asSFRounded() -> UIFont {
+    func asSFRounded() -> UIFont {
         if #available(iOS 13.0, *) {
             let fontSize = self.pointSize
             let systemFont = UIFont.systemFont(ofSize: fontSize, weight: self.weight)
@@ -121,8 +121,8 @@ extension UIFont {
 
 }
 
-extension UIColor {
-    public var hex3String: String {
+public extension UIColor {
+    var hex3String: String {
        let components = self.cgColor.components
        let r: CGFloat = components?[0] ?? 0.0
        let g: CGFloat = components?[1] ?? 0.0
@@ -132,14 +132,14 @@ extension UIColor {
        return hexString
     }
     
-    public convenience init(hex3: Int) {
+    convenience init(hex3: Int) {
         let r = CGFloat((hex3 >> 16) & 0xff)/255.0
         let g = CGFloat((hex3 >> 8) & 0xff)/255.0
         let b = CGFloat(hex3 & 0xff)/255.0
         self.init(red: r, green: g, blue: b, alpha: 1)
     }
     
-    public convenience init(hex3String: String) {
+    convenience init(hex3String: String) {
         var hexInt: UInt64 = 0
         let scanner: Scanner = Scanner(string: hex3String)
         scanner.scanHexInt64(&hexInt)
@@ -147,7 +147,7 @@ extension UIColor {
         self.init(hex3: int)
     }
     
-    public var hex4String: String {
+    var hex4String: String {
        let components = self.cgColor.components
        let r: CGFloat = components?[0] ?? 0.0
        let g: CGFloat = components?[1] ?? 0.0
@@ -158,7 +158,7 @@ extension UIColor {
        return hexString
     }
 
-    public convenience init(hex4: Int) {
+    convenience init(hex4: Int) {
         let r = CGFloat((hex4 >> 24) & 0xff)/255.0
         let g = CGFloat((hex4 >> 16) & 0xff)/255.0
         let b = CGFloat((hex4 >> 8) & 0xff)/255.0
@@ -167,7 +167,7 @@ extension UIColor {
     }
 
     // CSS convention: RRGGBBAA
-    public convenience init(hex4String: String) {
+    convenience init(hex4String: String) {
         var hexInt: UInt64 = 0
         let scanner: Scanner = Scanner(string: hex4String)
         scanner.scanHexInt64(&hexInt)
@@ -177,18 +177,18 @@ extension UIColor {
 
     // Display P3 color profile support
     
-    public convenience init(p3r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) {
+    convenience init(p3r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) {
         self.init(displayP3Red: p3r, green: g, blue: b, alpha: a)
     }
     
-    public convenience init(p3hex3: Int) {
+    convenience init(p3hex3: Int) {
         let r = CGFloat((p3hex3 >> 16) & 0xff)/255.0
         let g = CGFloat((p3hex3 >> 8) & 0xff)/255.0
         let b = CGFloat(p3hex3 & 0xff)/255.0
         self.init(p3r: r, g, b)
     }
 
-    public convenience init(p3hex3String: String) {
+    convenience init(p3hex3String: String) {
         var hexInt: UInt64 = 0
         let scanner: Scanner = Scanner(string: p3hex3String)
         scanner.scanHexInt64(&hexInt)
@@ -196,7 +196,7 @@ extension UIColor {
         self.init(p3hex3: int)
     }
 
-    public convenience init(p3hex4: Int) {
+    convenience init(p3hex4: Int) {
         let r = CGFloat((p3hex4 >> 24) & 0xff)/255.0
         let g = CGFloat((p3hex4 >> 16) & 0xff)/255.0
         let b = CGFloat((p3hex4 >> 8) & 0xff)/255.0
@@ -204,7 +204,7 @@ extension UIColor {
         self.init(p3r: r, g, b, a)
     }
 
-    public convenience init(p3hex4String: String) {
+    convenience init(p3hex4String: String) {
         var hexInt: UInt64 = 0
         let scanner: Scanner = Scanner(string: p3hex4String)
         scanner.scanHexInt64(&hexInt)
@@ -214,12 +214,12 @@ extension UIColor {
 
     //
     
-    public static func systemTintColor() -> UIColor {
+    static func systemTintColor() -> UIColor {
         return UIColor(red: 0.0, green: 0.478, blue: 1.0, alpha: 1.0)
     }
     
     @available(*, deprecated, message: "Use hex3String instead")
-    public var hexString: String {
+    var hexString: String {
        let components = self.cgColor.components
        let r: CGFloat = components?[0] ?? 0.0
        let g: CGFloat = components?[1] ?? 0.0
@@ -230,7 +230,7 @@ extension UIColor {
     }
     
     @available(*, deprecated, message: "Use UIColor(hex3:) instead")
-    public static func colorFromHex(_ hex: Int) -> UIColor {
+    static func colorFromHex(_ hex: Int) -> UIColor {
         let redPart = CGFloat((hex >> 16) & 0xff)/255.0
         let greenPart = CGFloat((hex >> 8) & 0xff)/255.0
         let bluePart = CGFloat(hex & 0xff)/255.0
@@ -238,7 +238,7 @@ extension UIColor {
     }
 
     @available(*, deprecated, message: "Use UIColor(hex3String:) instead")
-    public static func colorFromHexStr(_ hexStr: String) -> UIColor {
+    static func colorFromHexStr(_ hexStr: String) -> UIColor {
         var hexInt: UInt64 = 0
         let scanner: Scanner = Scanner(string: hexStr)
         scanner.scanHexInt64(&hexInt)
@@ -247,9 +247,9 @@ extension UIColor {
     }
 }
 
-extension UIView {
+public extension UIView {
     
-    public func subviewAt(point: CGPoint) -> UIView? {
+    func subviewAt(point: CGPoint) -> UIView? {
         for view in subviews {
             if view.frame.contains(point) {
                 return view
@@ -259,12 +259,12 @@ extension UIView {
         return nil
     }
     
-    public func rotateTo(angle: CGFloat) {
+    func rotateTo(angle: CGFloat) {
         let radians = angle / 180.0 * CGFloat(Double.pi)
         self.transform = CGAffineTransform.init(rotationAngle: radians)
     }
     
-    public func continuousRotate(duration: CFTimeInterval) {
+    func continuousRotate(duration: CFTimeInterval) {
         let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
         rotateAnimation.fromValue = 0.0
         rotateAnimation.toValue = CGFloat(Double.pi * 2)
@@ -274,42 +274,42 @@ extension UIView {
         self.layer.add(rotateAnimation, forKey: nil)
     }
     
-    public func roundCorners(radius: CGFloat) {
+    func roundCorners(radius: CGFloat) {
         self.layer.cornerRadius = radius
         self.clipsToBounds = true
     }
     
-    public func moveX(_ delta: CGFloat) {
+    func moveX(_ delta: CGFloat) {
         var frame = self.frame
         frame.origin.x += delta
         self.frame = frame
     }
     
-    public func moveY(_ delta: CGFloat) {
+    func moveY(_ delta: CGFloat) {
         var frame = self.frame
         frame.origin.y += delta
         self.frame = frame
     }
     
-    public func changeHeight(_ height: CGFloat) {
+    func changeHeight(_ height: CGFloat) {
         var frame = self.frame
         frame.size.height = height
         self.frame = frame
     }
     
-    public func changeWidth(_ width: CGFloat) {
+    func changeWidth(_ width: CGFloat) {
         var frame = self.frame
         frame.size.width = width
         self.frame = frame
     }
     
-    public func setFrameOrigin(_ newOrigin: CGPoint) {
+    func setFrameOrigin(_ newOrigin: CGPoint) {
         var frame = self.frame
         frame.origin = newOrigin
         self.frame = frame
     }
     
-    public var firstResponder: UIView? {
+    var firstResponder: UIView? {
         guard !self.isFirstResponder else { return self }
         
         for subview in self.subviews {
@@ -321,7 +321,7 @@ extension UIView {
         return nil
     }
     
-    public func doIncorrectAttemptShakeAnimation() {
+    func doIncorrectAttemptShakeAnimation() {
         // shakes the view like macOS's "wrong password" text field shake animation
         self.frame = self.frame.offsetBy(dx: -1.0, dy: 0.0)
         UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 0.2, initialSpringVelocity: 1800.0, options: [], animations: {
@@ -329,21 +329,21 @@ extension UIView {
         }, completion: nil)
     }
     
-    public func doBumpUpAnimation() {
+    func doBumpUpAnimation() {
         self.frame = self.frame.offsetBy(dx: 0.0, dy: 1.0)
         UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 900.0, options: [], animations: {
             self.frame = self.frame.offsetBy(dx: 0.0, dy: -1.0)
         }, completion: nil)
     }
     
-    public func doBumpDownAnimation() {
+    func doBumpDownAnimation() {
         self.frame = self.frame.offsetBy(dx: 0.0, dy: -1.0)
         UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 0.6, initialSpringVelocity: 900.0, options: [], animations: {
             self.frame = self.frame.offsetBy(dx: 0.0, dy: 1.0)
         }, completion: nil)
     }
     
-    public func doBounceAnimation(dur1: Double = 0.07,
+    func doBounceAnimation(dur1: Double = 0.07,
                            dur2: Double = 0.2,
                            scale: CGFloat = 0.85,
                            completion: (()->())? = nil) {
@@ -368,7 +368,7 @@ extension UIView {
         })
     }
     
-    public func fadeTransition(_ duration:CFTimeInterval) {
+    func fadeTransition(_ duration:CFTimeInterval) {
         let animation = CATransition()
         animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
         animation.type = .fade
@@ -376,7 +376,7 @@ extension UIView {
         self.layer.add(animation, forKey: "fade")
     }
     
-    public func doFlyToViewBumpAnimation(toView: UIView) {
+    func doFlyToViewBumpAnimation(toView: UIView) {
         guard let superview = superview,
             let containerView = superview.window?.rootViewController?.view,
             let toViewScreenRect = toView.superview?.convert(toView.frame, to: nil)
@@ -402,7 +402,7 @@ extension UIView {
                 
     }
     
-    public func recursiveSubviews() -> [UIView] {
+    func recursiveSubviews() -> [UIView] {
         var views = [UIView]()
         views.append(self)
         for next in subviews {
@@ -412,25 +412,25 @@ extension UIView {
     }
 }
 
-extension UIViewController {
-    public func addAsChild(parentVC: UIViewController, containerView: UIView) {
+public extension UIViewController {
+    func addAsChild(parentVC: UIViewController, containerView: UIView) {
         parentVC.addChild(self)
         let view = self.view!.forAutoLayout()
         containerView.addSubview(view)
         view.constrainToSuperviewEdges()
         self.didMove(toParent: parentVC)
     }
-    public func removeChildFromParent() {
+    func removeChildFromParent() {
         self.willMove(toParent: nil)
         self.view.removeFromSuperview()
         self.removeFromParent()
     }
-    public func createNoTextBackButton() {
+    func createNoTextBackButton() {
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     // When the keyboard appears, use this if a certain view (like a Continue button) needs to be visible. Do not call within the keyboardWillShow animation block.
-    public func scrollViewToVisible(scrollView: UIScrollView, kbdHeight: CGFloat, targetView: UIView, padding: CGFloat = 0) {
+    func scrollViewToVisible(scrollView: UIScrollView, kbdHeight: CGFloat, targetView: UIView, padding: CGFloat = 0) {
         var visibleFrame = view.frame
         visibleFrame.size.height -= kbdHeight
         
@@ -446,7 +446,7 @@ extension UIViewController {
         }
     }
 
-    public func present(_ vc: UIViewController, customTransition: CATransitionType, duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
+    func present(_ vc: UIViewController, customTransition: CATransitionType, duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
         guard let window = self.view.window else {
             return
         }
@@ -456,7 +456,7 @@ extension UIViewController {
         window.layer.add(transition, forKey: nil)
         self.present(vc, animated: false, completion: completion)
     }
-    public func dismiss(customTransition: CATransitionType, duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
+    func dismiss(customTransition: CATransitionType, duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
         guard let window = self.view.window else {
             Logger.log("*** no window"); completion?(); return
         }
@@ -468,8 +468,8 @@ extension UIViewController {
     }
 }
 
-extension UIScrollView {    
-    public func scrollToView(view: UIView, animated: Bool = false) {
+public extension UIScrollView {
+    func scrollToView(view: UIView, animated: Bool = false) {
         var childStartRect = view.convert(view.bounds, to: self)
         childStartRect.size.height += 90 // extra padding so view isn't right at the edge of the scroll view's top or bottom
         childStartRect.origin.y -= 40
@@ -485,7 +485,7 @@ extension UIScrollView {
         }
     }
     
-    public func recenterForScale(_ scale: CGFloat) {
+    func recenterForScale(_ scale: CGFloat) {
         // Keep the scroll content centered while zooming or resizing. This is worked out by seeing that while scaling the graph, the viewable area (scrollView.bounds) remains fixed while the total width (scrollView.contentSize) and offset (scrollView.contentOffset) change. We can keep the center fixed by scaling the content offset with a fixed ratio, where the ratio is:
         //
         // r = offset / (contentWidth - boundsWidth)
@@ -506,27 +506,27 @@ extension UIScrollView {
     }
 }
 
-extension UINavigationController {
-    public func makeTransparent() {
+public extension UINavigationController {
+    func makeTransparent() {
         self.navigationBar.setBackgroundImage(UIImage(), for: .default)
         self.navigationBar.shadowImage = UIImage()
     }
     
-    public func pushViewController(_ viewController: UIViewController, customTransition: CATransitionType, duration: TimeInterval = 0.3) {
+    func pushViewController(_ viewController: UIViewController, customTransition: CATransitionType, duration: TimeInterval = 0.3) {
         let transition = CATransition()
         transition.duration = duration
         transition.type = customTransition
         self.view.layer.add(transition, forKey: nil)
         self.pushViewController(viewController, animated: false)
     }
-    @discardableResult public func popViewController(customTransition: CATransitionType, duration: TimeInterval = 0.3) -> UIViewController? {
+    @discardableResult func popViewController(customTransition: CATransitionType, duration: TimeInterval = 0.3) -> UIViewController? {
         let transition = CATransition()
         transition.duration = duration
         transition.type = customTransition
         self.view.layer.add(transition, forKey: nil)
         return self.popViewController(animated: false)
     }
-    @discardableResult public func popToViewController(_ viewController: UIViewController, customTransition: CATransitionType, duration: TimeInterval = 0.3) -> [UIViewController]? {
+    @discardableResult func popToViewController(_ viewController: UIViewController, customTransition: CATransitionType, duration: TimeInterval = 0.3) -> [UIViewController]? {
         let transition = CATransition()
         transition.duration = duration
         transition.type = customTransition
@@ -535,24 +535,24 @@ extension UINavigationController {
     }
 }
 
-extension UITextField {
-    public var isEmpty: Bool {
+public extension UITextField {
+    var isEmpty: Bool {
         return self.text.nonNil.isEmpty
     }
 }
 
-extension UITabBar {
-    public func orderedTabBarItemViews() -> [UIView] {
+public extension UITabBar {
+    func orderedTabBarItemViews() -> [UIView] {
         let interactionViews = subviews.filter({$0.isUserInteractionEnabled})
         return interactionViews.sorted(by: {$0.frame.minX < $1.frame.minX})
     }
 }
 
-extension UIImageView {
-    public func makeTintable() {
+public extension UIImageView {
+    func makeTintable() {
         self.image = self.image?.withRenderingMode(.alwaysTemplate)
     }
-    public func setImage(_ image: UIImage?, animatingWithDuration: TimeInterval) {
+    func setImage(_ image: UIImage?, animatingWithDuration: TimeInterval) {
         mainAsync {
             UIView.transition(with: self, duration: 0.3, options: .transitionCrossDissolve, animations: {
                 self.image = image
@@ -561,8 +561,8 @@ extension UIImageView {
     }
 }
 
-extension UILabel {
-    @IBInspectable public var kerning: CGFloat {
+public extension UILabel {
+    @IBInspectable var kerning: CGFloat {
         get {
             var range = NSMakeRange(0, (text ?? "").count)
             guard let kern = attributedText?.attribute(.kern, at: 0, effectiveRange: &range),
@@ -589,29 +589,29 @@ extension UILabel {
         }
     }
     
-    public func heightForWidth(_ width: CGFloat) -> CGFloat {
+    func heightForWidth(_ width: CGFloat) -> CGFloat {
         let boundingBox = self.attributedText!.boundingRect(with: CGSize(width: width, height: .greatestFiniteMagnitude), options: .usesLineFragmentOrigin, context: nil)
         return boundingBox.height
     }
 }
 
-extension UITextView {
-    public func heightForWidth(_ width: CGFloat) -> CGFloat {
+public extension UITextView {
+    func heightForWidth(_ width: CGFloat) -> CGFloat {
         let boundingBox = self.attributedText!.boundingRect(with: CGSize(width: width, height: .greatestFiniteMagnitude), options: .usesLineFragmentOrigin, context: nil)
         return boundingBox.height
     }
 }
 
-extension UIImage {
+public extension UIImage {
     
-    public class func imageFromView(_ view: UIView) -> UIImage {
+    class func imageFromView(_ view: UIView) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0)
         defer { UIGraphicsEndImageContext() }
         view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
         return UIGraphicsGetImageFromCurrentImageContext() ?? UIImage()
     }
     
-    public func resize(to newSize: CGSize) -> UIImage? {
+    func resize(to newSize: CGSize) -> UIImage? {
         guard self.size != newSize else { return self }
 
         UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
@@ -621,7 +621,7 @@ extension UIImage {
         return UIGraphicsGetImageFromCurrentImageContext()
     }
 
-    public func pixelBuffer() -> CVPixelBuffer? {
+    func pixelBuffer() -> CVPixelBuffer? {
 
         let width = Int(self.size.width)
         let height = Int(self.size.height)
@@ -653,7 +653,7 @@ extension UIImage {
     }
     
     // uses "aspect fit"
-    public func resize(targetSizePx: CGSize) -> UIImage? {
+    func resize(targetSizePx: CGSize) -> UIImage? {
         let size = self.size
         
         let widthRatio  = targetSizePx.width  / self.size.width
@@ -679,7 +679,7 @@ extension UIImage {
         return newImage
     }
     
-    public func resample(bpc: Int) -> UIImage? {
+    func resample(bpc: Int) -> UIImage? {
         let imageRect = CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height)
         guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) else { return nil }
         let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue)
@@ -698,7 +698,7 @@ extension UIImage {
     }
     
     // returns the same image but with an orientation of .up. (note: can be slow.)
-    public func fixOrientation() -> UIImage {
+    func fixOrientation() -> UIImage {
         guard let cgImage = cgImage else { return self }
         if imageOrientation == .up { return self }
         var transform = CGAffineTransform.identity
@@ -749,7 +749,7 @@ extension UIImage {
         return self
     }
     
-    public class func image(with color: UIColor) -> UIImage {
+    class func image(with color: UIColor) -> UIImage {
         let rect = CGRect(origin: CGPoint(x: 0, y:0), size: CGSize(width: 1, height: 1))
         UIGraphicsBeginImageContext(rect.size)
         let context = UIGraphicsGetCurrentContext()!
@@ -764,7 +764,7 @@ extension UIImage {
     }
     
     
-    public func sizePxForMaxSide(_ maxSide: CGFloat) -> CGSize {
+    func sizePxForMaxSide(_ maxSide: CGFloat) -> CGSize {
         var sizePx = self.size
         sizePx.width *= self.scale
         sizePx.height *= self.scale
@@ -787,14 +787,14 @@ extension UIImage {
         return newSize
     }
     
-    public func crop(rect: CGRect) -> UIImage {
+    func crop(rect: CGRect) -> UIImage {
         let fixedImage = self.fixOrientation()
         let imageRef = fixedImage.cgImage!.cropping(to: rect)
         let image = UIImage(cgImage: imageRef!, scale: fixedImage.scale, orientation: fixedImage.imageOrientation)
         return image
     }
     
-    public func crop(aspect: CGFloat) -> UIImage {
+    func crop(aspect: CGFloat) -> UIImage {
         let fixedImage = self.fixOrientation()
         let size = fixedImage.size
         let myAspect = size.width/size.height
@@ -826,7 +826,7 @@ extension UIImage {
         return image
     }
     
-    public func rectOfCrop(toAspect aspect: CGFloat) -> CGRect {
+    func rectOfCrop(toAspect aspect: CGFloat) -> CGRect {
         let fixedImage = self.fixOrientation()
         let size = fixedImage.size
         let myAspect = size.width/size.height
@@ -856,7 +856,7 @@ extension UIImage {
         return cropRect
     }
 
-    public func applyingBorder(color: UIColor, size: CGFloat) -> UIImage {
+    func applyingBorder(color: UIColor, size: CGFloat) -> UIImage {
         let imgSize = self.size
         UIGraphicsBeginImageContext(imgSize)
         let rect = CGRect(x: 0, y: 0, width: imgSize.width, height: imgSize.height)
@@ -877,7 +877,7 @@ extension UIImage {
         return image
     }
     
-    public func getUnderlyingData() -> Data? {
+    func getUnderlyingData() -> Data? {
         if let dataProvider = self.cgImage?.dataProvider, let underlyingData = dataProvider.data as Data? {
             return underlyingData
         } else {
@@ -887,8 +887,8 @@ extension UIImage {
 
 }
 
-extension UIEdgeInsets {
-    mutating public func offset(by offset: UIEdgeInsets) {
+public extension UIEdgeInsets {
+    mutating func offset(by offset: UIEdgeInsets) {
         top -= offset.top
         left -= offset.left
         bottom -= offset.bottom
@@ -896,8 +896,8 @@ extension UIEdgeInsets {
     }
 }
 
-extension UIStackView {
-    public func removeAllArrangedSubviews() {
+public extension UIStackView {
+    func removeAllArrangedSubviews() {
         for view in self.arrangedSubviews {
             self.removeArrangedSubview(view)
             view.removeFromSuperview()
@@ -905,8 +905,8 @@ extension UIStackView {
     }
 }
 
-extension UITableView {
-    public func safeSelect(at path: IndexPath, animated: Bool, scrollPosition: UITableView.ScrollPosition, notify: Bool = false) {
+public extension UITableView {
+    func safeSelect(at path: IndexPath, animated: Bool, scrollPosition: UITableView.ScrollPosition, notify: Bool = false) {
         let numRows = self.numberOfRows(inSection: path.section)
         if path.row < numRows {
             self.selectRow(at: path, animated: animated, scrollPosition: scrollPosition)

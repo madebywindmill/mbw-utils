@@ -48,44 +48,44 @@ public class MBWAttributedString {
     }
 }
 
-extension String {
+public extension String {
     
-    public var attributed: NSAttributedString {
+    var attributed: NSAttributedString {
         return NSAttributedString(string: self)
     }
     
-    public var light: NSAttributedString {
+    var light: NSAttributedString {
         return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : Font.systemFont(ofSize: 17.0, weight: .light)])
     }
     
-    public var regular: NSAttributedString {
+    var regular: NSAttributedString {
         return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : Font.systemFont(ofSize: 17.0, weight: .regular)])
     }
     
-    public var semibold: NSAttributedString {
+    var semibold: NSAttributedString {
         return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : Font.systemFont(ofSize: 17.0, weight: .semibold)])
     }
     
-    public var bold: NSAttributedString {
+    var bold: NSAttributedString {
         return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : Font.systemFont(ofSize: 17.0, weight: .bold)])
     }
 }
 
-extension NSAttributedString {
+public extension NSAttributedString {
     
-    public static func +(lhs: NSAttributedString, rhs: NSAttributedString) -> NSAttributedString {
+    static func +(lhs: NSAttributedString, rhs: NSAttributedString) -> NSAttributedString {
         let newstr = NSMutableAttributedString(attributedString: lhs)
         newstr.append(rhs)
         return newstr
     }
     
-    public func strikethrough() -> NSAttributedString {
+    func strikethrough() -> NSAttributedString {
         let mutableString = NSMutableAttributedString(attributedString: self)
         mutableString.addAttribute(.strikethroughStyle, value: 1, range: NSRange(location: 0, length: mutableString.length))
         return mutableString
     }
     
-    public func letterpressed() -> NSAttributedString {
+    func letterpressed() -> NSAttributedString {
         let mutableString = NSMutableAttributedString(attributedString: self)
         #if !targetEnvironment(simulator) && !targetEnvironment(macCatalyst)
         mutableString.addAttribute(.textEffect, value: NSAttributedString.TextEffectStyle.letterpressStyle, range: NSRange(location: 0, length: mutableString.length))
@@ -93,19 +93,19 @@ extension NSAttributedString {
         return mutableString
     }
     
-    public func kern(_ points: Float) -> NSAttributedString {
+    func kern(_ points: Float) -> NSAttributedString {
         let mutableString = NSMutableAttributedString(attributedString: self)
         mutableString.addAttribute(.kern, value: points, range: NSRange(location: 0, length: mutableString.length))
         return mutableString
     }
     
-    public func paragraphStyle(_ style: NSParagraphStyle) -> NSAttributedString {
+    func paragraphStyle(_ style: NSParagraphStyle) -> NSAttributedString {
         let mutableString = NSMutableAttributedString(attributedString: self)
         mutableString.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: mutableString.length))
         return mutableString
     }
     
-    public func font(_ font: Font, color: Color? = nil) -> NSAttributedString {
+    func font(_ font: Font, color: Color? = nil) -> NSAttributedString {
         let mutableString = NSMutableAttributedString(attributedString: self)
         mutableString.addAttribute(.font, value: font, range: NSRange(location: 0, length: mutableString.length))
         if let color = color {
@@ -114,7 +114,7 @@ extension NSAttributedString {
         return mutableString
     }
         
-    public func fontFace(_ font: Font, color: Color? = nil) -> NSAttributedString {
+    func fontFace(_ font: Font, color: Color? = nil) -> NSAttributedString {
         let mutableString = NSMutableAttributedString(attributedString: self)
         mutableString.setFontFace(font: font, color: color)
         return mutableString
@@ -122,9 +122,9 @@ extension NSAttributedString {
     
 }
 
-extension NSMutableAttributedString {
+public extension NSMutableAttributedString {
     
-    public func setFontFace(font: Font, color: Color? = nil) {
+    func setFontFace(font: Font, color: Color? = nil) {
         // TODO: fix Apple bug where SF rounded isn't getting the correct weight
         beginEditing()
         self.enumerateAttribute(

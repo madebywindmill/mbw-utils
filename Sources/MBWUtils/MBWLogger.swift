@@ -128,8 +128,8 @@ public class Logger {
     }
 }
 
-extension UserDefaults {
-    public var lastLogRollDate: Date {
+public extension UserDefaults {
+    var lastLogRollDate: Date {
         get {
             return self.object(forKey: "MBWLoggerLastRollDate") as? Date ?? Date.distantPast
         }
