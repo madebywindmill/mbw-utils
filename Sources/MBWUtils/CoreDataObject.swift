@@ -108,5 +108,15 @@ open class CoreDataObject: NSManagedObject {
         }
         return nil
     }
+    
+    /// Create and return an exact copy of the object
+    open func unmanagedCopy() -> Self? {
+        let obj = CoreDataObject(entity: entity, insertInto: nil)
+        for (key,_) in self.entity.attributesByName {
+            let value = self.value(forKey: key)
+            obj.setValue(value, forKey: key)
+        }
+        return obj as? Self
+    }
 }
 
