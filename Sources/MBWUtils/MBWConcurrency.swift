@@ -31,13 +31,13 @@ public func globalAsyncAfter(_ interval: TimeInterval, _ block: @escaping (()->(
 
 // MARK: - ParallelAsync
 
-//  ParallelAsync behaves a lot like an OperationQueue + dependencies with the following exceptions:
-//
-//  * It always executes synchronously, which allows for local object retainment.
-//  * The completion always executes on the main thread.
-//  * It has a more concise syntax.
-//
+/** ParallelAsync behaves a lot like an OperationQueue + dependencies with the following exceptions:
 
+  * It always executes synchronously, which allows for local object retainment.
+  * The completion always executes on the main thread.
+  * It has a more concise syntax.
+
+*/
 public class ParallelAsync {
     private var serialQ = DispatchQueue(label: "ParallelAsyncSerialQ")
     private var group = DispatchGroup()
@@ -60,5 +60,25 @@ public class ParallelAsync {
         DispatchQueue.main.async {
             completion()
         }
+    }
+}
+
+public extension DispatchQueue {
+    
+    private static var _onceTracker = Set<String>()
+    
+    /// Execute a block of code exactly once per token.
+    /// - Parameters:
+    ///   - token: A unique token. Typically this is the address of the calling object, e.g. `DispatchQueue.once(addressString(of: self))…`
+    ///   - block: The block to be executed
+    class func once(token: String, block:()->Void) {
+        objc_sync_enter(self); defer { objc_sync_exit(self) }
+
+        if _onceTracker.contains(token) {
+            return
+        }
+
+        _onceTracker.insert(token)
+        block()
     }
 }

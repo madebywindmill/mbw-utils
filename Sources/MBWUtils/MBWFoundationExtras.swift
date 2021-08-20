@@ -425,3 +425,7 @@ public extension NSPointerArray {
         removePointer(at: index)
     }
 }
+
+public func addressString(of obj: AnyObject) -> String {
+    return "\(Unmanaged.passUnretained(obj).toOpaque())"
+}
