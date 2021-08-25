@@ -69,7 +69,7 @@ public extension DispatchQueue {
     
     /// Execute a block of code exactly once per token.
     /// - Parameters:
-    ///   - token: A unique token. Typically this is the address of the calling object, e.g. `DispatchQueue.once(addressString(of: self))…`
+    ///   - token: A unique token
     ///   - block: The block to be executed
     class func once(token: String, block:()->Void) {
         objc_sync_enter(self); defer { objc_sync_exit(self) }
@@ -80,5 +80,13 @@ public extension DispatchQueue {
 
         _onceTracker.insert(token)
         block()
+    }
+    
+    /// Execute a block of code exactly once per object.
+    /// - Parameters:
+    ///   - sender: The object wishing to execute the block one time
+    ///   - block: The block to be executed
+    class func once(sender: AnyObject, block:()->Void) {
+        DispatchQueue.once(token: addressString(of: self), block: block)
     }
 }
