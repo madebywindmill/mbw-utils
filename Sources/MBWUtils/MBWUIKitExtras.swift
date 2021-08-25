@@ -588,7 +588,37 @@ public extension UILabel {
             self.attributedText = attText
         }
     }
-    
+
+    @IBInspectable var lineHeightMultiple: CGFloat {
+        get {
+            var range = NSMakeRange(0, (text ?? "").count)
+            guard let ps = attributedText?.attribute(.paragraphStyle, at: 0, effectiveRange: &range) as? NSParagraphStyle else {
+                    return 0
+            }
+            return CGFloat(ps.lineHeightMultiple)
+        }
+        set {
+            var attText:NSMutableAttributedString
+            
+            if let attributedText = attributedText {
+                attText = NSMutableAttributedString(attributedString: attributedText)
+            } else if let text = text {
+                attText = NSMutableAttributedString(string: text)
+            } else {
+                attText = NSMutableAttributedString(string: "")
+            }
+            
+            var pStyle = attributedText?.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSMutableParagraphStyle
+            if pStyle == nil {
+                pStyle = NSMutableParagraphStyle()
+            }
+            pStyle!.lineHeightMultiple = newValue
+            let range = NSMakeRange(0, attText.length)
+            attText.addAttribute(.paragraphStyle, value: pStyle!, range: range)
+            self.attributedText = attText
+        }
+    }
+
     func heightForWidth(_ width: CGFloat) -> CGFloat {
         let boundingBox = self.attributedText!.boundingRect(with: CGSize(width: width, height: .greatestFiniteMagnitude), options: .usesLineFragmentOrigin, context: nil)
         return boundingBox.height
