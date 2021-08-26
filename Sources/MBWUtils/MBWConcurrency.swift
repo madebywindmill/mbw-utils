@@ -87,7 +87,7 @@ public extension DispatchQueue {
     ///   - sender: The object wishing to execute the block one time
     ///   - block: The block to be executed
     class func once(sender: AnyObject, file: String = #file, line: Int = #line, block:()->Void) {
-        let token = addressString(of: self) + file + "\(line)"
+        let token = addressString(of: sender) + file + "\(line)"
         DispatchQueue.once(token: token, block: block)
     }
 }
