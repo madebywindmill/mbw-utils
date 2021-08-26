@@ -9,8 +9,6 @@ import Foundation
 
 let serverInterfaceAPITimeout = 90.0
 
-public typealias JSONObject = [String:Any]
-
 open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDelegate {
     
     public typealias RequestCompletionHandler = (
