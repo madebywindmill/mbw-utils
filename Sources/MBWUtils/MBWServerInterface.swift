@@ -21,8 +21,6 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
     public typealias BasicErrorCompletionHandler = (_ error: Error?) -> Void
 
     public enum RequestOptions: String {
-        case queryPairs = "queryPairs"
-        case headerFields = "headerFields"
         case nonMainCompletion = "nonMainCompletion" // Completions are sent on the main thread by default. If you don't want that, set this.
         case formEncodeData = "formEncodeData"
         case customBaseURL = "customBaseURL" // overrides self.baseURL
@@ -54,8 +52,8 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
     public var basicUsername: String?
     public var basicPassword: String?
     
-    static public let insertedArrayKey = "<mbwInsertedArrayKey>"
-    static public let insertedDataKey = "<mbwInsertedDataKey>"
+    static public let insertedArrayKey = "<insertedArrayKey>"
+    static public let insertedDataKey = "<insertedDataKey>"
 
     convenience public init(accessToken: String) {
         self.init()
@@ -64,6 +62,8 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
     
     public func sendRequest(endpoint: String,
                      payload: Any!,
+                     httpHeaders: [String:Any]? = nil,
+                     queryPairs: [URLQueryItem] = [],
                      options: Dictionary<RequestOptions, Any>? = nil,
                      httpMethod: HTTPMethod,
                      completion: RequestCompletionHandler?) {
@@ -96,9 +96,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         }
 
         // Add query strings, if any
-        if let queryPairs = unwrappedOptions[.queryPairs] as? [URLQueryItem] {
-            url = url?.appending(queryPairs: queryPairs)
-        }
+        url = url?.appending(queryPairs: queryPairs)
         
         if url == nil {
             Logger.fileLog("*** Couldn't create URL. Bad chars?")
@@ -125,8 +123,8 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         }
                 
         // Add other http header fields
-        if let httpHeaderFields = unwrappedOptions[.headerFields] {
-            for (key, value) in httpHeaderFields as! Dictionary<String, String> {
+        if let httpHeaders = httpHeaders {
+            for (key, value) in httpHeaders as! Dictionary<String, String> {
                 request.addValue(value, forHTTPHeaderField: key)
             }
         }
