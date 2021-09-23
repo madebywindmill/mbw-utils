@@ -33,13 +33,13 @@ public func globalAsyncAfter(_ interval: TimeInterval, _ block: @escaping (()->(
 
 /** ParallelAsync behaves a lot like an OperationQueue + dependencies with the following exceptions:
 
-  * It always executes synchronously, which allows for local object retainment.
+  * It executeAndWait executes synchronously, which allows for local object retainment.
   * The completion always executes on the main thread.
   * It has a more concise syntax.
 
 */
 public class ParallelAsync {
-    private var serialQ = DispatchQueue(label: "ParallelAsyncSerialQ")
+    private var parallelQ = DispatchQueue(label: "ParallelAsyncParallelQ", attributes: .concurrent)
     private var group = DispatchGroup()
     private var blocks = [(()->Void)]()
     
@@ -50,9 +50,12 @@ public class ParallelAsync {
     }
     
     public func executeAndWait(completion: @escaping (()->Void)) {
+        let group = DispatchGroup()
         for nextBlock in blocks {
-            serialQ.async(group: group) {
+            group.enter()
+            parallelQ.async {
                 nextBlock()
+                group.leave()
             }
         }
         group.wait()
