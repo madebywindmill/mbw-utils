@@ -31,26 +31,41 @@ public func globalAsyncAfter(_ interval: TimeInterval, _ block: @escaping (()->(
 
 // MARK: - ParallelAsync
 
-/** ParallelAsync behaves a lot like an OperationQueue + dependencies with the following exceptions:
+/** ParallelAsync simplifies the queueing of concurrent operations. It has some advantages over common OperationQueue usage:
 
-  * It executeAndWait executes synchronously, which allows for local object retainment.
+  * Its executeAndWait executes synchronously, which allows for local object retainment.
   * The completion always executes on the main thread.
   * It has a more concise syntax.
 
+ ParallelAsync can work with a provided `OperationQueue` (which is handy if you want to set a concurrency limit), otherwise it uses `DispatchGroup`.
 */
 public class ParallelAsync {
-    private var parallelQ = DispatchQueue(label: "ParallelAsyncParallelQ", attributes: .concurrent)
-    private var group = DispatchGroup()
-    private var blocks = [(()->Void)]()
     
-    public init() { }
+    private var parallelQ = DispatchQueue(label: "ParallelAsyncParallelQ", attributes: .concurrent)
+    private var blocks = [(()->Void)]()
+    private var opq: OperationQueue?
+    
+    /// Instantiate a ParallelAsync object. The provided `opq` will be used if provided, otherwise a DispatchGroup is used.
+    public init(opq: OperationQueue? = nil) {
+        self.opq = opq
+    }
     
     public func add(_ block: @escaping (()->Void)) {
         blocks.append(block)
     }
     
+    /// Execute all blocks, wait for their completion, and fire the completion block on the main thread when done.
+    /// Since this is a synchronous function, do not call on the main thread from a UIKit/AppKit/SwiftUI app.
     public func executeAndWait(completion: @escaping (()->Void)) {
-        let group = DispatchGroup()
+        if let opq = opq {
+            _executeAndWaitWithOpQ(opq, completion: completion)
+        } else {
+            let group = DispatchGroup()
+            _executeAndWaitWithGroup(group, completion: completion)
+        }
+    }
+    
+    private func _executeAndWaitWithGroup(_ group: DispatchGroup, completion: @escaping (()->Void)) {
         for nextBlock in blocks {
             group.enter()
             parallelQ.async {
@@ -64,6 +79,18 @@ public class ParallelAsync {
             completion()
         }
     }
+    
+    private func _executeAndWaitWithOpQ(_ opq: OperationQueue, completion: @escaping (()->Void)) {
+        for nextBlock in blocks {
+            opq.addOperation(nextBlock)
+        }
+        opq.waitUntilAllOperationsAreFinished()
+        
+        DispatchQueue.main.async {
+            completion()
+        }
+    }
+
 }
 
 public extension DispatchQueue {
