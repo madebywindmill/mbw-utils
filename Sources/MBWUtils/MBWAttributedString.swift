@@ -11,8 +11,10 @@
 
 #if os(iOS)
 import UIKit
-#else
+#elseif os(OSX)
 import AppKit
+#elseif os(watchOS)
+import WatchKit
 #endif
 
 public class MBWAttributedString {
@@ -143,14 +145,20 @@ public extension NSMutableAttributedString {
                 if let traits = font.fontDescriptor.fontAttributes[.traits] {
                     newFontDescriptor = newFontDescriptor.addingAttributes([FontDescriptor.AttributeName.traits: traits])
                 }
-
-
+                
+                
                 let newFont = Font(
                     descriptor: newFontDescriptor,
                     size: font.pointSize
                 )
                 removeAttribute(.font, range: range)
+#if os(iOS) || os(watchOS)
                 addAttribute(.font, value: newFont, range: range)
+#elseif os(OSX)
+                if let newFont = newFont {
+                    addAttribute(.font, value: newFont, range: range)
+                }
+#endif
                 if let color = color {
                     removeAttribute(
                         .foregroundColor,

@@ -8,11 +8,12 @@
 #if os(iOS)
 import UIKit
 public typealias View = UIView
-#else // os(OSX)
+#elseif os(OSX)
 import AppKit
 public typealias View = NSView
 #endif
 
+#if os(iOS) || os(OSX)
 public extension View {
     
     // Auto layout convenience:
@@ -283,3 +284,4 @@ public extension NSLayoutConstraint {
         UserDefaults.standard.setValue(enabled, forKey: "_UIConstraintBasedLayoutLogUnsatisfiable")
     }
 }
+#endif

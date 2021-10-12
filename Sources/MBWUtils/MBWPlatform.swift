@@ -5,13 +5,13 @@
 //  Created by John Scalo on 2/4/21.
 //
 
-#if os(iOS)
+#if os(iOS)  || os(watchOS)
 import UIKit
 public typealias Font = UIFont
 public typealias Image = UIImage
 public typealias Color = UIColor
 public typealias FontDescriptor = UIFontDescriptor
-#else // osx
+#elseif os(OSX)
 import AppKit
 public typealias Font = NSFont
 public typealias Image = NSImage
@@ -22,7 +22,7 @@ public typealias FontDescriptor = NSFontDescriptor
 // On macOS Font.familyName is an optional but on iOS it's not. Conform to iOS.
 public extension Font {
     var platformFriendlyFamilyName: String {
-        #if os(iOS)
+        #if os(iOS) || os(watchOS)
         return self.familyName
         #else
         return self.familyName ?? "unknown font family"
