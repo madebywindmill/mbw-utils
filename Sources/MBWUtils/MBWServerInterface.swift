@@ -137,6 +137,9 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         let session = URLSession(configuration: URLSessionConfiguration.default, delegate: self, delegateQueue: nil)
         
         debugLog(request.fullDescription())
+        if let formData = payload as? MBWServerInterfaceFormData {
+            debugLog("FORM DATA: \(formData.description)")
+        }
         
         // Set up the task
         let task = session.dataTask(with: request) { (data, response, error) in
