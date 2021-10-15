@@ -116,6 +116,10 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         if unwrappedOptions[.formEncodeData] != nil {
             self.addFormEncodedBody(payload: payload, request: &request)
         } else if let formData = payload as? MBWServerInterfaceFormData  {
+            if !formData.isClosed {
+                Logger.log("*** Warning: formData wasn't closed so ending boundary is missing. It will be added for you.")
+                formData.close()
+            }
             request.httpBody = formData.formData as Data
             request.addValue("multipart/form-data; boundary=\(formData.formBoundary)", forHTTPHeaderField: "Content-Type")
         } else {
@@ -319,10 +323,18 @@ public extension URL {
     }
 }
 
-public class MBWServerInterfaceFormData {
+public class MBWServerInterfaceFormData: CustomStringConvertible {
     var formData = NSMutableData()
     let formBoundary = "Boundary-\(UUID().uuidString)"
+    var isClosed = false
     
+    // Used only for the description
+    var debugFields = JSONObject()
+
+    public var description: String {
+        return debugFields.jsonStr ?? "<nil>"
+    }
+
     public init() {}
 
     public func addField(name: String, value: Any) {
@@ -332,6 +344,7 @@ public class MBWServerInterfaceFormData {
         fieldString += "\(value)\r\n"
 
         formData.appendString(fieldString)
+        debugFields[name] = value
     }
     
     public func addFile(fileName: String, fieldName: String, mimeType: String, fileData: Data) {
@@ -344,10 +357,12 @@ public class MBWServerInterfaceFormData {
         data.appendString("\r\n")
         
         formData.append(data as Data)
+        debugFields[fieldName] = "<file data of length \(fileData.count)>; <mime-type: \(mimeType)>; <filename: \(fileName)>"
     }
     
     public func close() {
         formData.appendString("--\(formBoundary)--")
+        isClosed = true
     }
 }
 
