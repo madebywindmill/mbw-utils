@@ -30,6 +30,9 @@ public class Logger {
         return url.appendingPathComponent("debugLog.txt")
     }
 
+    public static var maxBytes: Int = 200000
+    public static var snipInterval: TimeInterval = 3600
+    
     private static let formatter = DateFormatter()
     public class func fileLog(_ str: String, file: String = #file, line: Int = #line, function: String = #function, debugOnly: Bool = false) {
         
@@ -97,14 +100,11 @@ public class Logger {
     }
     
     private class func shouldSnip() -> Bool {
-        // Don't check more than once an hour.
-        return abs(UserDefaults.standard.lastLogRollDate.timeIntervalSinceNow) > 3600
+        return abs(UserDefaults.standard.lastLogRollDate.timeIntervalSinceNow) > snipInterval
     }
     
     private class func snip() {
         mbwLoggerQ.async {
-            let maxBytes = 200000
-            
             guard let data = try? Data(contentsOf: debugFileURL) else {
                 return
             }

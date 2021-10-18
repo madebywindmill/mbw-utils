@@ -162,7 +162,8 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
                     }
                 }
                 if let jsonDict = jsonDict {
-                    self.debugLog(">>> JSON response:\n\(jsonDict.prettyPrint())")
+                    let jsonStr = jsonDict.jsonStr ?? "<null>"
+                    self.debugLog(">>> JSON response:\n\(jsonStr)")
                 } else {
                     self.debugLog(">>> Response not a JSON object")
                     // Not a dictionary and not an array, so drop back and insert the raw data.
