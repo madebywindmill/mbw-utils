@@ -47,6 +47,10 @@ public extension View {
         self.autoResizeTranslationCheck()
         self.constrainToEdgesOf(self.superview!, offset: offset, activate: activate)
     }
+    func constrainToSuperviewEdges(with insets: UIEdgeInsets, activate: Bool = true) {
+        self.autoResizeTranslationCheck()
+        self.constrainToEdgesOf(self.superview!, with: insets, activate: activate)
+    }
     func constrainToEdgesOf(_ view: View, offset:CGFloat = 0, activate: Bool = true) {
         self.autoResizeTranslationCheck()
         self.leftAnchor.constraint(equalTo: view.leftAnchor, constant: offset).isActive = activate
@@ -54,6 +58,14 @@ public extension View {
         self.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: offset * -1).isActive = activate
         self.topAnchor.constraint(equalTo: view.topAnchor, constant: offset).isActive = activate
     }
+    func constrainToEdgesOf(_ view: View, with insets: UIEdgeInsets, activate: Bool = true) {
+        self.autoResizeTranslationCheck()
+        self.leftAnchor.constraint(equalTo: view.leftAnchor, constant: insets.left).isActive = true
+        self.rightAnchor.constraint(equalTo: view.rightAnchor, constant: insets.right).isActive = true
+        self.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: insets.bottom).isActive = true
+        self.topAnchor.constraint(equalTo: view.topAnchor, constant: insets.top).isActive = true
+    }
+
     @discardableResult func constrainToSuperviewLeading(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c: NSLayoutConstraint
