@@ -649,6 +649,12 @@ public extension UITextView {
 
 public extension UIImage {
     
+    @available(iOS 13.0, *)
+    convenience init?(systemName: String, pointSize: CGFloat, weight: UIImage.SymbolWeight) {
+        let config = UIImage.SymbolConfiguration(pointSize: pointSize, weight: weight)
+        self.init(systemName: systemName, withConfiguration: config)
+    }
+
     class func imageFromView(_ view: UIView) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0)
         defer { UIGraphicsEndImageContext() }
@@ -929,7 +935,6 @@ public extension UIImage {
             return nil
         }
     }
-
 }
 
 public extension UIEdgeInsets {
