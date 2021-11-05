@@ -66,7 +66,7 @@ public extension View {
         self.topAnchor.constraint(equalTo: view.topAnchor, constant: insets.top).isActive = true
     }
 
-    @discardableResult func constrainToSuperviewLeading(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) -> NSLayoutConstraint {
+    @discardableResult func constrainToSuperviewLeading(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false, useMargin: Bool = false) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c: NSLayoutConstraint
         if useSafeArea {
@@ -75,13 +75,19 @@ public extension View {
             #else
             c = NSLayoutConstraint(); assertionFailure("safeAreaLayoutGuide not supported on macOS")
             #endif
+        } else if useMargin {
+            #if os(iOS)
+            c = self.leadingAnchor.constraint(equalTo: self.superview!.layoutMarginsGuide.leadingAnchor, constant: offset)
+            #else
+            c = NSLayoutConstraint(); assertionFailure("layoutMarginsGuide not supported on macOS")
+            #endif
         } else {
             c = self.leadingAnchor.constraint(equalTo: self.superview!.leadingAnchor, constant: offset)
         }
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainToSuperviewLeft(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) -> NSLayoutConstraint {
+    @discardableResult func constrainToSuperviewLeft(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false, useMargin: Bool = false) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c: NSLayoutConstraint
         if useSafeArea {
@@ -90,13 +96,19 @@ public extension View {
             #else
             c = NSLayoutConstraint(); assertionFailure("safeAreaLayoutGuide not supported on macOS")
             #endif
+        } else if useMargin {
+            #if os(iOS)
+            c = self.leftAnchor.constraint(equalTo: self.superview!.layoutMarginsGuide.leftAnchor, constant: offset)
+            #else
+            c = NSLayoutConstraint(); assertionFailure("layoutMarginsGuide not supported on macOS")
+            #endif
         } else {
             c = self.leftAnchor.constraint(equalTo: self.superview!.leftAnchor, constant: offset)
         }
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainToSuperviewTrailing(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) -> NSLayoutConstraint {
+    @discardableResult func constrainToSuperviewTrailing(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false, useMargin: Bool = false) -> NSLayoutConstraint {
         // NB: offset is negated to be more intuitive
         self.autoResizeTranslationCheck()
         let c: NSLayoutConstraint
@@ -106,14 +118,19 @@ public extension View {
             #else
             c = NSLayoutConstraint(); assertionFailure("safeAreaLayoutGuide not supported on macOS")
             #endif
+        } else if useMargin {
+            #if os(iOS)
+            c = self.trailingAnchor.constraint(equalTo: self.superview!.layoutMarginsGuide.trailingAnchor, constant: -offset)
+            #else
+            c = NSLayoutConstraint(); assertionFailure("layoutMarginsGuide not supported on macOS")
+            #endif
         } else {
             c = self.trailingAnchor.constraint(equalTo: self.superview!.trailingAnchor, constant: -offset)
         }
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainToSuperviewRight(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) -> NSLayoutConstraint {
-        // NB: offset is negated to be more intuitive
+    @discardableResult func constrainToSuperviewRight(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false, useMargin: Bool = false) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c: NSLayoutConstraint
         if useSafeArea {
@@ -122,13 +139,19 @@ public extension View {
             #else
             c = NSLayoutConstraint(); assertionFailure("safeAreaLayoutGuide not supported on macOS")
             #endif
+        } else if useMargin {
+            #if os(iOS)
+            c = self.rightAnchor.constraint(equalTo: self.superview!.layoutMarginsGuide.rightAnchor, constant: -offset)
+            #else
+            c = NSLayoutConstraint(); assertionFailure("layoutMarginsGuide not supported on macOS")
+            #endif
         } else {
             c = self.rightAnchor.constraint(equalTo: self.superview!.rightAnchor, constant: -offset)
         }
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainToSuperviewTop(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) -> NSLayoutConstraint {
+    @discardableResult func constrainToSuperviewTop(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false, useMargin: Bool = false) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c: NSLayoutConstraint
         if useSafeArea {
@@ -137,13 +160,19 @@ public extension View {
             #else
             c = NSLayoutConstraint(); assertionFailure("safeAreaLayoutGuide not supported on macOS")
             #endif
+        } else if useMargin {
+            #if os(iOS)
+            c = self.topAnchor.constraint(equalTo: self.superview!.layoutMarginsGuide.topAnchor, constant: offset)
+            #else
+            c = NSLayoutConstraint(); assertionFailure("layoutMarginsGuide not supported on macOS")
+            #endif
         } else {
             c = self.topAnchor.constraint(equalTo: self.superview!.topAnchor, constant: offset)
         }
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainToSuperviewBottom(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) -> NSLayoutConstraint {
+    @discardableResult func constrainToSuperviewBottom(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false, useMargin: Bool = false) -> NSLayoutConstraint {
         // NB: offset is negated to be more intuitive
         self.autoResizeTranslationCheck()
         let c: NSLayoutConstraint
@@ -152,6 +181,12 @@ public extension View {
             c = self.bottomAnchor.constraint(equalTo: self.superview!.safeAreaLayoutGuide.bottomAnchor, constant: -offset)
             #else
             c = NSLayoutConstraint(); assertionFailure("safeAreaLayoutGuide not supported on macOS")
+            #endif
+        } else if useMargin {
+            #if os(iOS)
+            c = self.bottomAnchor.constraint(equalTo: self.superview!.layoutMarginsGuide.bottomAnchor, constant: -offset)
+            #else
+            c = NSLayoutConstraint(); assertionFailure("layoutMarginsGuide not supported on macOS")
             #endif
         } else {
             c = self.bottomAnchor.constraint(equalTo: self.superview!.bottomAnchor, constant: -offset)
