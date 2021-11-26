@@ -15,7 +15,7 @@ public class Logger {
         #if DEBUG
         let shortenedFile = file.components(separatedBy: "/").last ?? ""
         let s = "[\(shortenedFile):\(function):\(line)] \(str)"
-        NSLog(s)
+        NSLog("%@", s)
         #endif
     }
     
@@ -59,7 +59,7 @@ public class Logger {
         let dateStr = formatter.string(from: Date())
         let s = "\(dateStr) [\(shortenedFile):\(function):\(line)] \(str)"
         let strForNSLog = "[\(shortenedFile):\(function):\(line)] \(str)"
-        NSLog(strForNSLog)
+        NSLog("%@", strForNSLog)
         
         mbwLoggerQ.async {
             if !FileManager.default.fileExists(atPath: debugFileURL.path) {
@@ -74,7 +74,7 @@ public class Logger {
                     logFile.closeFile()
                 }
             } catch {
-                NSLog("*** Caught: \(error)")
+                NSLog("*** Caught: %@", "\(error)")
             }
         }
     }
@@ -120,7 +120,7 @@ public class Logger {
             do {
                 try newData.write(to: debugFileURL, options: .atomic)
             } catch {
-                NSLog("*** Caught: \(error)")
+                NSLog("*** Caught: %@", "\(error)")
             }
             
             UserDefaults.standard.lastLogRollDate = Date()
