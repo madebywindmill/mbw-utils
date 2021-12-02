@@ -662,18 +662,7 @@ public extension UIImage {
         return UIGraphicsGetImageFromCurrentImageContext() ?? UIImage()
     }
     
-    func resize(to newSize: CGSize) -> UIImage? {
-        guard self.size != newSize else { return self }
-
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
-        self.draw(in: CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height))
-
-        defer { UIGraphicsEndImageContext() }
-        return UIGraphicsGetImageFromCurrentImageContext()
-    }
-
     func pixelBuffer() -> CVPixelBuffer? {
-
         let width = Int(self.size.width)
         let height = Int(self.size.height)
 
@@ -696,19 +685,52 @@ public extension UIImage {
         context.scaleBy(x: 1.0, y: -1.0)
 
         UIGraphicsPushContext(context)
-        self.draw(in: CGRect(x: 0, y: 0, width: width, height: height))
+        draw(in: CGRect(x: 0, y: 0, width: width, height: height))
         UIGraphicsPopContext()
         CVPixelBufferUnlockBaseAddress(pixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
 
         return pixelBuffer
     }
+
+    /// Resize to `newSize` using screen points by default or `scale` if provided.
+    func resize(to newSize: CGSize, scale: CGFloat = 0) -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(newSize, false, scale)
+        draw(in: CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height))
+
+        defer { UIGraphicsEndImageContext() }
+        return UIGraphicsGetImageFromCurrentImageContext()
+    }
     
-    // uses "aspect fit"
-    func resize(targetSizePx: CGSize) -> UIImage? {
-        let size = self.size
+    /// Resize to the new width using screen points by default or `scale` if provided.
+    func resize(newWidth: CGFloat, scale: CGFloat = 0) -> UIImage? {
+        let r = newWidth / size.width
+        let newHeight = size.height * r
+        let newSize = CGSize(width: newWidth, height: newHeight)
         
-        let widthRatio  = targetSizePx.width  / self.size.width
-        let heightRatio = targetSizePx.height / self.size.height
+        UIGraphicsBeginImageContextWithOptions(newSize, false, scale)
+        draw(in: CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
+        
+        defer { UIGraphicsEndImageContext() }
+        return UIGraphicsGetImageFromCurrentImageContext()
+    }
+
+    /// Resize to the new height using screen points by default or `scale` if provided.
+    func resize(newHeight: CGFloat, scale: CGFloat = 0) -> UIImage? {
+        let r = newHeight / size.height
+        let newWidth = size.width * r
+        let newSize = CGSize(width: newWidth, height: newHeight)
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, false, scale)
+        draw(in: CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
+        
+        defer { UIGraphicsEndImageContext() }
+        return UIGraphicsGetImageFromCurrentImageContext()
+    }
+
+    /// Resize the image to the target size, using an "aspect fit" strategy. The new size uses the native scale of the source image.
+    func resize(targetSizePx: CGSize) -> UIImage? {
+        let widthRatio  = targetSizePx.width  / size.width
+        let heightRatio = targetSizePx.height / size.height
         var newSize: CGSize
         
         if widthRatio > heightRatio {
@@ -717,19 +739,42 @@ public extension UIImage {
             newSize = CGSize(width: floor(size.width * widthRatio),  height: floor(size.height * widthRatio))
         }
         
-        newSize.width /= self.scale
-        newSize.height /= self.scale
+        newSize.width /= scale
+        newSize.height /= scale
         
         let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
         
-        UIGraphicsBeginImageContextWithOptions(newSize, false, self.scale)
-        self.draw(in: rect)
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return newImage
+        UIGraphicsBeginImageContextWithOptions(newSize, false, scale)
+        draw(in: rect)
+
+        defer { UIGraphicsEndImageContext() }
+        return UIGraphicsGetImageFromCurrentImageContext()
     }
     
+    /// Returns a size that will fit the image with a maximum "side", i.e. length or width. The new size uses the native scale of the source image.
+    func sizePxForMaxSide(_ maxSide: CGFloat) -> CGSize {
+        var sizePx = size
+        sizePx.width *= scale
+        sizePx.height *= scale
+        
+        // If we're already smaller than max on both sides, return current size in px.
+        if max(sizePx.width, sizePx.height) < maxSide {
+            return size
+        }
+        
+        let widthRatio  = maxSide  / size.width
+        let heightRatio = maxSide / size.height
+        var newSize: CGSize
+        
+        if widthRatio > heightRatio {
+            newSize = CGSize(width: floor(sizePx.width * heightRatio), height: floor(sizePx.height * heightRatio))
+        } else {
+            newSize = CGSize(width: floor(sizePx.width * widthRatio),  height: floor(sizePx.height * widthRatio))
+        }
+        
+        return newSize
+    }
+
     func resample(bpc: Int) -> UIImage? {
         let imageRect = CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height)
         guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) else { return nil }
@@ -812,30 +857,6 @@ public extension UIImage {
         UIGraphicsEndImageContext()
         
         return image!.resizableImage(withCapInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
-    }
-    
-    
-    func sizePxForMaxSide(_ maxSide: CGFloat) -> CGSize {
-        var sizePx = self.size
-        sizePx.width *= self.scale
-        sizePx.height *= self.scale
-        
-        // If we're already smaller than max on both sides, return current size in px.
-        if max(sizePx.width, sizePx.height) < maxSide {
-            return size
-        }
-        
-        let widthRatio  = maxSide  / self.size.width
-        let heightRatio = maxSide / self.size.height
-        var newSize: CGSize
-        
-        if widthRatio > heightRatio {
-            newSize = CGSize(width: floor(sizePx.width * heightRatio), height: floor(sizePx.height * heightRatio))
-        } else {
-            newSize = CGSize(width: floor(sizePx.width * widthRatio),  height: floor(sizePx.height * widthRatio))
-        }
-        
-        return newSize
     }
     
     func crop(rect: CGRect) -> UIImage {
