@@ -655,6 +655,14 @@ public extension UIImage {
         self.init(systemName: systemName, withConfiguration: config)
     }
 
+    /// Searches for a resource of this name (including the extension) in the app's main bundle and returns the image.
+    convenience init?(fromMainBundleResourceName name: String) {
+        guard let url = Bundle.main.url(forResource: name, withExtension: nil) else { return nil }
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        self.init(data: data)
+    }
+
+    /// Render a bitmap from the provided view and all its subviews. Also see UIView.snapshotView() and CALayer.render() both of which are probably faster.
     class func imageFromView(_ view: UIView) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 0)
         defer { UIGraphicsEndImageContext() }
