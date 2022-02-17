@@ -405,3 +405,19 @@ public class MBWServerInterfaceError: NSError {
     }
 
 }
+
+public extension Error {
+    func isHTTPStatusCode() -> Bool {
+        let e = self as NSError
+        return e.domain == MBWServerInterfaceError.httpDomain
+    }
+    
+    var httpStatusCode: Int? {
+        let e = self as NSError
+        if e.domain == MBWServerInterfaceError.httpDomain {
+            return e.code
+        } else {
+            return nil
+        }
+    }
+}
