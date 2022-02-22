@@ -264,6 +264,11 @@ public extension UIColor {
 
 public extension UIView {
     
+    convenience init(backgroundColor: UIColor) {
+        self.init()
+        self.backgroundColor = backgroundColor
+    }
+    
     func subviewAt(point: CGPoint) -> UIView? {
         for view in subviews {
             if view.frame.contains(point) {
