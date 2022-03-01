@@ -1,11 +1,11 @@
 //
-//  MBWAttributedString.swift
+//  MBWAttributedStringHelper.swift
 //
 //  Created by John Scalo on 3/21/17.
 //  Copyright © 2017-2021 Made by Windmill. All rights reserved.
 //
 // Example usage:
-// let attrStr = MBWAttributedString()
+// let attrStr = MBWAttributedStringHelper()
 // someLabel.attributedText = attrStr.bold("some bold text") + attrStr.norm(" some normal text")
 //
 
@@ -17,7 +17,7 @@ import AppKit
 import WatchKit
 #endif
 
-public class MBWAttributedString {
+public class MBWAttributedStringHelper {
     
     public init() {}
 
