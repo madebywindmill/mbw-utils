@@ -8,9 +8,11 @@
 #if os(iOS)
 import UIKit
 public typealias View = UIView
+public typealias EdgeInsets = UIEdgeInsets
 #elseif os(OSX)
 import AppKit
 public typealias View = NSView
+public typealias EdgeInsets = NSEdgeInsets
 #endif
 
 #if os(iOS) || os(OSX)
@@ -47,7 +49,7 @@ public extension View {
         self.autoResizeTranslationCheck()
         self.constrainToEdgesOf(self.superview!, offset: offset, activate: activate)
     }
-    func constrainToSuperviewEdges(with insets: UIEdgeInsets, activate: Bool = true) {
+    func constrainToSuperviewEdges(with insets: EdgeInsets, activate: Bool = true) {
         self.autoResizeTranslationCheck()
         self.constrainToEdgesOf(self.superview!, with: insets, activate: activate)
     }
@@ -58,7 +60,7 @@ public extension View {
         self.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: offset * -1).isActive = activate
         self.topAnchor.constraint(equalTo: view.topAnchor, constant: offset).isActive = activate
     }
-    func constrainToEdgesOf(_ view: View, with insets: UIEdgeInsets, activate: Bool = true) {
+    func constrainToEdgesOf(_ view: View, with insets: EdgeInsets, activate: Bool = true) {
         self.autoResizeTranslationCheck()
         self.leftAnchor.constraint(equalTo: view.leftAnchor, constant: insets.left).isActive = true
         self.rightAnchor.constraint(equalTo: view.rightAnchor, constant: insets.right).isActive = true
