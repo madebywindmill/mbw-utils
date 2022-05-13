@@ -2,7 +2,7 @@
 //  MBWServerInterface.swift
 //
 //  Created by John Scalo on 7/16/18.
-//  Copyright © 2018-2021 Made by Windmill. All rights reserved.
+//  Copyright © 2018-2022 Made by Windmill. All rights reserved.
 //
 
 import Foundation

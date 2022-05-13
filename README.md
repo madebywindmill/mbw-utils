@@ -13,7 +13,7 @@ MBWLogger logs to a log file in the shared app group directory, so:
 
 ## MIT License
 
-Copyright (c) 2021 Made by Windmill, LLC
+Copyright (c) 2022 Made by Windmill, LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

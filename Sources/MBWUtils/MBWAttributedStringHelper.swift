@@ -2,7 +2,7 @@
 //  MBWAttributedStringHelper.swift
 //
 //  Created by John Scalo on 3/21/17.
-//  Copyright © 2017-2021 Made by Windmill. All rights reserved.
+//  Copyright © 2017-2022 Made by Windmill. All rights reserved.
 //
 // Example usage:
 // let attrStr = MBWAttributedStringHelper()

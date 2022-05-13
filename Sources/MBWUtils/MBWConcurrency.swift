@@ -2,7 +2,7 @@
 //  MBWConcurrency.swift
 //  
 //  Created by John Scalo on 6/9/21.
-//  Copyright © 2017-2021 Made by Windmill. All rights reserved.
+//  Copyright © 2017-2022 Made by Windmill. All rights reserved.
 //
 
 import Foundation

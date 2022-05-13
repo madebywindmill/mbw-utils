@@ -2,7 +2,7 @@
 //  MBWConstants.swift
 //
 //  Created by John Scalo on 1/5/21.
-//  Copyright © 2021 Made by Windmill. All rights reserved.
+//  Copyright © 2022 Made by Windmill. All rights reserved.
 //
 
 import Foundation
