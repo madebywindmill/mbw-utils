@@ -19,4 +19,24 @@ open class CircleView: UIView {
     }
 }
 
+/// A UIImageView that draws itself as a circle, using corner radii.
+open class CircleImageView: UIImageView {
+
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        layer.cornerRadius = bounds.width/2
+    }
+
+}
+
+/// A UIButton that draws itself as a circle, using corner radii.
+open class CircleButton: UIButton {
+
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        layer.cornerRadius = bounds.width/2
+    }
+
+}
+
 #endif
