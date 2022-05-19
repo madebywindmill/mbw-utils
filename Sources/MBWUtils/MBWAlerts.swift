@@ -15,6 +15,7 @@ public class AlertController : UIAlertController {
     
     public class func showSimpleAlert(title: String,
                                       message: String,
+                                      buttonTitle: String = "OK",
                                       tintColor: UIColor? = nil,
                                       vc: UIViewController,
                                       completion: (() -> Void)? = nil) {
@@ -26,13 +27,10 @@ public class AlertController : UIAlertController {
             alert.view.tintColor = tintColor
         }
         
-        if completion == nil {
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-        } else {
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: {(UIAlertAction) in
-                completion!()
-            }))
-        }
+        alert.addAction(UIAlertAction(title: buttonTitle, style: .default, handler: {(UIAlertAction) in
+            completion?()
+        }))
+        
         vc.present(alert, animated: true)
     }
     
