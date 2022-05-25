@@ -151,7 +151,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
             
             let httpResponse = response as! HTTPURLResponse
             
-            self.debugLog(">>> \(httpResponse.statusCode) returned for \(request.url!)")
+            self.debugLog("⬇️ \(httpResponse.statusCode) returned for \(request.url!)")
             
             var jsonDict: JSONObject?
             if let data = data {
@@ -163,14 +163,14 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
                 }
                 if let jsonDict = jsonDict {
                     let jsonStr = jsonDict.jsonStr ?? "<null>"
-                    self.debugLog(">>> JSON response:\n\(jsonStr)")
+                    self.debugLog("⬇️ JSON response:\n\(jsonStr)")
                 } else {
-                    self.debugLog(">>> Response not a JSON object")
+                    self.debugLog("⬇️ Response not a JSON object")
                     // Not a dictionary and not an array, so drop back and insert the raw data.
                     jsonDict = [MBWServerInterface.insertedDataKey: data]
                 }
             } else {
-                self.debugLog(">>> Response data was empty")
+                self.debugLog("⬇️ Response data was empty")
             }
             
             // Treat http status codes above 300 as errors
@@ -193,14 +193,14 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         }
         
         // And start it
-        debugLog(">>> requesting: \(httpMethod.rawValue) \(request.url!)")
+        debugLog("⬆️ requesting: \(httpMethod.rawValue) \(request.url!)")
         
         task.resume()
     }
     
     // Redirects will strip our auth header. Re-add it here.
     public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
-        debugLog(">>> redirecting: \(String(describing: request.url))")
+        debugLog("➡️ redirecting: \(String(describing: request.url))")
         if request.allHTTPHeaderFields?["rToken"] != nil && request.allHTTPHeaderFields?["Authorization"] == nil {
             
             var newRequest = URLRequest(url: request.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: serverInterfaceAPITimeout)
