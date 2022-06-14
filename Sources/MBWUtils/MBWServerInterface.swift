@@ -60,6 +60,31 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         self.accessToken = accessToken
     }
     
+    @available(iOS 13.0.0, macOS 12.0.0, *)
+    @discardableResult public func sendRequest(endpoint: String,
+                     payload: Any!,
+                     httpHeaders: [String:Any]? = nil,
+                     queryPairs: [URLQueryItem] = [],
+                     options: Dictionary<RequestOptions, Any>? = nil,
+                     httpMethod: HTTPMethod) async throws -> (JSONObject?, HTTPURLResponse?) {
+        
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(JSONObject?, HTTPURLResponse?),Error>) in
+            self.sendRequest(endpoint: endpoint,
+                        payload: payload,
+                        httpHeaders: httpHeaders,
+                        queryPairs: queryPairs,
+                        options: options,
+                        httpMethod: httpMethod) { (json, response, error) in
+                
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: (json, response))
+                }
+            }
+        }
+    }
+
     public func sendRequest(endpoint: String,
                      payload: Any!,
                      httpHeaders: [String:Any]? = nil,
