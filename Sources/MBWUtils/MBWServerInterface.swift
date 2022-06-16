@@ -69,11 +69,16 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
                      httpMethod: HTTPMethod) async throws -> (JSONObject?, HTTPURLResponse?) {
         
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(JSONObject?, HTTPURLResponse?),Error>) in
+        
+            // Bypass main thread completion default.
+            var fixedOptions = options ?? [RequestOptions:Any]()
+            fixedOptions[.nonMainCompletion] = true
+
             self.sendRequest(endpoint: endpoint,
                         payload: payload,
                         httpHeaders: httpHeaders,
                         queryPairs: queryPairs,
-                        options: options,
+                        options: fixedOptions,
                         httpMethod: httpMethod) { (json, response, error) in
                 
                 if let error = error {
@@ -93,10 +98,10 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
                      httpMethod: HTTPMethod,
                      completion: RequestCompletionHandler?) {
         
-        // By default we send completions on the main thread but the caller can change this with serverInterfaceNonMainCompletionKey
+        // By default we send completions on the main thread but the caller can change this with RequestOptions.nonMainCompletion
         var actualCompletion: RequestCompletionHandler?
         if completion != nil {
-            if options?[.nonMainCompletion] != nil {
+            if let options = options, let b = options[.nonMainCompletion] as? Bool, b == true {
                 actualCompletion = completion
             } else {
                 actualCompletion = {(jsonDictionary, response, error) in
