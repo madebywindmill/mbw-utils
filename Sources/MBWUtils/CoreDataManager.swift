@@ -96,6 +96,18 @@ public class CoreDataManager {
         return nil
     }
     
+    /// async/await-safe version of the above
+    @available(iOS 13, macOS 11.0, *)
+    open func save() async throws {
+        @MainActor func saveMain() -> Error? {
+            return save()
+        }
+        
+        if let e = await saveMain() {
+            throw e
+        }
+    }
+
     /// Print all objects in the store to console. **WARNING**: brings entire object graph into memory. For debugging use only.
     public func printAllObjects() {
         guard let model = mainContext.persistentStoreCoordinator?.managedObjectModel else {

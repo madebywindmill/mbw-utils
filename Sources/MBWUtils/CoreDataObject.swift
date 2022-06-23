@@ -136,6 +136,7 @@ open class CoreDataObject: NSManagedObject {
             throw e
         }
     }
+    
     /// Create and return an exact copy of the object
     open func unmanagedCopy() -> Self? {
         let obj = CoreDataObject(entity: entity, insertInto: nil)
