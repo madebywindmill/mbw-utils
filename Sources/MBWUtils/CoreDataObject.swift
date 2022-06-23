@@ -95,6 +95,22 @@ open class CoreDataObject: NSManagedObject {
         return (managedObject, wasCreated, nil)
     }
     
+    /// async/await-safe version of the above
+    @available(iOS 13, macOS 11.0, *)
+    @discardableResult open func insertOrUpdate(saveContext: Bool = true) async throws -> (CoreDataObject?, Bool /* wasCreated */) {
+        @MainActor func insertMain() -> (CoreDataObject?, Bool /* wasCreated */, Error?) {
+            return insertOrUpdate(saveContext: saveContext)
+        }
+
+        let (o, b, e) = await insertMain()
+        
+        if let e = e {
+            throw e
+        } else {
+            return (o, b)
+        }
+    }
+    
     /// Delete this object from the store and optionally save the context.
     /// - Parameter saveContext: Whether to save the context after inserting. When updating many objects one after the other, set to false and save the context when finished.
     /// - Returns: An optional error.
@@ -109,6 +125,17 @@ open class CoreDataObject: NSManagedObject {
         return nil
     }
     
+    /// async/await-safe version of the above
+    @available(iOS 13, macOS 11.0, *)
+    open func deleteObject(saveContext: Bool = true) async throws {
+        @MainActor func deleteMain() -> Error? {
+            return deleteObject(saveContext: saveContext)
+        }
+        
+        if let e = await deleteMain() {
+            throw e
+        }
+    }
     /// Create and return an exact copy of the object
     open func unmanagedCopy() -> Self? {
         let obj = CoreDataObject(entity: entity, insertInto: nil)
