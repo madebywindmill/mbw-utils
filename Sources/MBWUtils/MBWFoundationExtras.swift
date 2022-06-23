@@ -334,6 +334,27 @@ public extension Optional where Wrapped == String {
     }
 }
 
+@available(iOS 13, macOS 11.0, *)
+@available(iOS, deprecated: 15.0, message: "Use the built-in API instead")
+@available(macOS, deprecated: 12.0, message: "Use the built-in API instead")
+public extension URLSession {
+    func data(fromURL url: URL) async throws -> (Data, URLResponse) {
+        try await withCheckedThrowingContinuation { continuation in
+            let task = self.dataTask(with: url) { data, response, error in
+                guard let data = data, let response = response else {
+                    let error = error ?? URLError(.badServerResponse)
+                    continuation.resume(throwing: error)
+                    return
+                }
+                
+                continuation.resume(returning: (data, response))
+            }
+            
+            task.resume()
+        }
+    }
+}
+
 public extension URL {
     func queryArguments() -> [String : AnyObject]? {
         var returnArgs = [String : AnyObject]()
@@ -429,3 +450,4 @@ public extension NSPointerArray {
 public func addressString(of obj: AnyObject) -> String {
     return "\(Unmanaged.passUnretained(obj).toOpaque())"
 }
+
