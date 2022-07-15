@@ -8,6 +8,7 @@
 #if os(iOS)
 
 import UIKit
+import CoreServices
 
 public extension UIApplication {
     var icon: UIImage? {
@@ -967,6 +968,45 @@ public class NoAutoScrollingScrollView: UIScrollView {
     
     public override func scrollRectToVisible(_ rect: CGRect, animated: Bool) {
         return
+    }
+}
+
+
+
+public extension UIPasteboard {
+    
+    /// Confusingly UIPasteboard offers several ways to get strings off the clipboard and in many cases one works while others don't. This convenience  pretty much tries all of them, preferring to return a UTF-8 string when possible.
+    var plainText: String? {
+        guard hasStrings else {
+            return nil
+        }
+        
+        if let str = string {
+            return str
+        } else if let str = strings?.first {
+            return str
+        } else if let data = data(forPasteboardType: "public.utf8-plain-text"), let str = String(data: data, encoding: .utf8) {
+            return str
+        } else if let data = data(forPasteboardType: "public.utf16-external-plain-text"), let str = String(data: data, encoding: .utf16) {
+            return str
+        } else if let data = data(forPasteboardType: "public.utf16-plain-text"), let str = String(data: data, encoding: .utf16) {
+            return str
+        } else if let data = data(forPasteboardType: "public.text"), let str = String(data: data, encoding: .utf8) {
+            return str
+        } else if let data = data(forPasteboardType: "public.plain-text"), let str = String(data: data, encoding: .utf8) {
+            return str
+        } else if let data = data(forPasteboardType: "public.html"), let str = String(data: data, encoding: .utf8) {
+            return str
+        } else if let data = data(forPasteboardType: "public.xml"), let str = String(data: data, encoding: .utf8) {
+            return str
+        } else if let data = data(forPasteboardType: "public.xhtml"), let str = String(data: data, encoding: .utf8) {
+            return str
+        } else if let data = data(forPasteboardType: kUTTypeURL as String), let str = String(data: data, encoding: .utf8) {
+            return str
+        } else {
+            print("Warning: no strings found when strings were promised.")
+            return nil
+        }
     }
 }
 
