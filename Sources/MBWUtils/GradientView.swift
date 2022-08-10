@@ -5,6 +5,8 @@
 //  Copyright © 2018-2022 Made by Windmill. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 open class GradientView: UIView {
@@ -88,3 +90,5 @@ open class GradientView: UIView {
     }
     
 }
+
+#endif
