@@ -48,6 +48,10 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
 
     public var enableDebugLogging = false
     
+    // Set regex replacements here to redact private data in the logs.
+    // E.g.: ["\"phoneNum\" : \".*\"": "\"phoneNum\" : \"<private>\""]
+    public var debugLoggingRegexReplacements = [String:String]()
+    
     // Set both for Basic auth
     public var basicUsername: String?
     public var basicPassword: String?
@@ -308,7 +312,14 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         if !shouldDebugLog {
             return
         }
-        Logger.fileLog(str)
+        var strCopy = str
+        for (key, val) in self.debugLoggingRegexReplacements {
+            strCopy = strCopy.replacingOccurrences(
+                of: key,
+                with: val,
+                options: .regularExpression)
+        }
+        Logger.fileLog(strCopy)
     }
 }
 
