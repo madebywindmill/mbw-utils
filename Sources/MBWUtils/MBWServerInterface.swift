@@ -442,7 +442,7 @@ public class MBWServerInterfaceError: NSError {
     }
 
     static public func forHTTPStatus(_ status: Int) -> NSError {
-        return NSError(domain: httpDomain, code: status, userInfo: [NSLocalizedDescriptionKey: "HTTP error: \(status)"])
+        return NSError(domain: httpDomain, code: status, userInfo: [NSLocalizedDescriptionKey: "HTTP status \(status)"])
     }
 
 }
