@@ -1,5 +1,5 @@
 //
-//  MBWAppKitExtras.swift
+//  AppKitExtras.swift
 //
 //  Created by John Scalo on 2/3/21.
 //  Copyright © 2018-2022 Made by Windmill. All rights reserved.

@@ -1,5 +1,5 @@
 //
-//  MBWUIKitExtras.swift
+//  UIKitExtras.swift
 //
 //  Created by John Scalo on 12/21/17.
 //  Copyright © 2018-2022 Made by Windmill. All rights reserved.

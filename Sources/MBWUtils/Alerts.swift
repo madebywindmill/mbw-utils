@@ -1,5 +1,5 @@
 //
-//  MBWAlerts.swift
+//  Alerts.swift
 //
 //  Created by John Scalo on 7/17/18.
 //  Copyright © 2018-2022 Made by Windmill. All rights reserved.
