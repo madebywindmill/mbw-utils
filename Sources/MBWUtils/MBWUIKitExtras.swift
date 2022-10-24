@@ -889,6 +889,15 @@ public extension UIImage {
             return nil
         }
     }
+    
+    var sizeInBytes: Int {
+        guard let cgImage = self.cgImage else {
+            assertionFailure()
+            return 0
+        }
+        return cgImage.bytesPerRow * cgImage.height
+    }
+
 }
 
 public extension UIEdgeInsets {
