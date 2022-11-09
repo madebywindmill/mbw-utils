@@ -15,6 +15,7 @@ open class CircleView: UIView {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
+        clipsToBounds = true
         layer.cornerRadius = bounds.width/2
     }
 }
@@ -24,6 +25,7 @@ open class CircleImageView: UIImageView {
 
     open override func layoutSubviews() {
         super.layoutSubviews()
+        clipsToBounds = true
         layer.cornerRadius = bounds.width/2
     }
 
@@ -34,6 +36,7 @@ open class CircleButton: UIButton {
 
     open override func layoutSubviews() {
         super.layoutSubviews()
+        clipsToBounds = true
         layer.cornerRadius = bounds.width/2
     }
 
