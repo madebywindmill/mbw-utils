@@ -28,11 +28,27 @@ public class CoreDataManager {
     /// Instantiate a CoreDataManager.
     /// - Parameter modelName: the name of the CoreData model resource file
     /// - Parameter dbName: the name to use for the sqlite database stored on disk
-    public init(modelName: String, dbName: String) {
-        guard let modelURL = Bundle.main.url(forResource: modelName,
-                                             withExtension: "momd") else {
-            fatalError("Failed to locate DataModel in app bundle")
+    /// - Parameter moduleName: the module (e.g. Swift package) containing the Core Data model file, if any
+    /// - Note If pulling the model from a Swift package:
+    ///     * Check the actual name of the Swift package bundle. Sometimes it will be named "MyPackage_MyPackage.bundle" instead of just "MyPackage.bundle" in which case you will want to set `moduleName` to `MyPackage_MyPackage`. You can set a breakpoint and use `FileManager.enumerateContentsOfDirectory` to see the bundle name.
+    ///     * For each Core Data entity, be sure to set the class module to the name of the package. It won't be listed in the popup. (You'll never need the underscore version here…)
+    public init(modelName: String, dbName: String, moduleName: String? = nil) {
+        let modelURL: URL
+        
+        if let moduleName = moduleName {
+            guard let tempURL = Bundle.bundleFromModuleWithName(moduleName).url(forResource: modelName,
+                                                                                withExtension: "momd") else {
+                fatalError("Failed to locate DataModel in app bundle")
+            }
+            modelURL = tempURL
+        } else {
+            guard let tempURL = Bundle.main.url(forResource: modelName,
+                                                 withExtension: "momd") else {
+                fatalError("Failed to locate DataModel in app bundle")
+            }
+            modelURL = tempURL
         }
+        
         guard let mom = NSManagedObjectModel(contentsOf: modelURL) else {
             fatalError("Failed to initialize MOM")
         }
@@ -151,5 +167,42 @@ public class CoreDataManager {
     public func deleteAll() {
         deleteAllObjects(entityName: "CoreDataObject")
         mainContext.reset()
+    }
+}
+
+// Taken from the SPM generated resource_bundle_accessor.swift that you normally get when including a Resources directory.
+private class BundleFinder {} // Presumably Apple defines this somewhere
+extension Foundation.Bundle {
+    static func bundleFromModuleWithName(_ bundleName: String) -> Bundle {
+
+        let overrides: [URL]
+        #if DEBUG
+        if let override = ProcessInfo.processInfo.environment["PACKAGE_RESOURCE_BUNDLE_URL"] {
+            overrides = [URL(fileURLWithPath: override)]
+        } else {
+            overrides = []
+        }
+        #else
+        overrides = []
+        #endif
+
+        let candidates = overrides + [
+            // Bundle should be present here when the package is linked into an App.
+            Bundle.main.resourceURL,
+
+            // Bundle should be present here when the package is linked into a framework.
+            Bundle(for: BundleFinder.self).resourceURL,
+
+            // For command-line tools.
+            Bundle.main.bundleURL,
+        ]
+
+        for candidate in candidates {
+            let bundlePath = candidate?.appendingPathComponent(bundleName + ".bundle")
+            if let bundle = bundlePath.flatMap(Bundle.init(url:)) {
+                return bundle
+            }
+        }
+        fatalError("unable to find bundle named \(bundleName)")
     }
 }
