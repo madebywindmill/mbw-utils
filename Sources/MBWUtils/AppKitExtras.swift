@@ -139,6 +139,14 @@ public extension NSImage {
         return newImage
     }
     
+    var sizeInBytes: Int {
+        guard let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            assertionFailure()
+            return 0
+        }
+        return cgImage.bytesPerRow * cgImage.height
+    }
+
 }
 
 
