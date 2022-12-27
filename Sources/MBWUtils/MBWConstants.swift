@@ -8,25 +8,30 @@
 import Foundation
 
 private var _appGroupIdentifier: String?
+private var _hasAttemptedAppGroupID = false
 
 public struct MBWConstants {
-    public static var appGroupIdentifier: String {
+    public static var appGroupIdentifier: String? {
         get {
-            if _appGroupIdentifier == nil {
+            if _appGroupIdentifier == nil && !_hasAttemptedAppGroupID {
                 _appGroupIdentifier = getAppGroupIdentifier()
             }
             return _appGroupIdentifier!
         }
     }
 
-    private static func getAppGroupIdentifier() -> String {
+    private static func getAppGroupIdentifier() -> String? {
+        _hasAttemptedAppGroupID = true
+        
         guard let infoDict = Bundle.main.infoDictionary else {
-            fatalError("Couldn't read Info.plist")
+            print("*** Couldn't read Info.plist")
+            return nil
         }
         if let str = infoDict["MBWAppGroupIdentifier"] as? String {
             return str
         } else {
-            fatalError("MBWAppGroupIdentifier missing from target's Info.plist")
+            print("*** MBWAppGroupIdentifier missing from target's Info.plist.")
+            return nil
         }
     }
 }

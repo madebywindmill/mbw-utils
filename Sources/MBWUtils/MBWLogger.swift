@@ -26,8 +26,13 @@ public class Logger {
     }
     
     public static var debugFileURL: URL {
-        let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: MBWConstants.appGroupIdentifier)!
-        return url.appendingPathComponent("debugLog.txt")
+        if let appGroupID = MBWConstants.appGroupIdentifier {
+            let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID)!
+            return url.appendingPathComponent("debugLog.txt")
+        } else {
+            let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            return url.appendingPathComponent("debugLog.txt")
+        }
     }
 
     public static var maxBytes: Int = 200000
