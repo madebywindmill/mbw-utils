@@ -16,7 +16,7 @@ public struct MBWConstants {
             if _appGroupIdentifier == nil && !_hasAttemptedAppGroupID {
                 _appGroupIdentifier = getAppGroupIdentifier()
             }
-            return _appGroupIdentifier!
+            return _appGroupIdentifier
         }
     }
 
