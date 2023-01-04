@@ -17,6 +17,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         _ error: NSError?
         ) -> Void
 
+    // Clients should consider using ErrorCompletionHandler from Types instead.
     public typealias BasicCompletionHandler = (_ error: NSError?) -> Void
     public typealias BasicErrorCompletionHandler = (_ error: Error?) -> Void
 
