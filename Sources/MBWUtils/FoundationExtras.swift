@@ -207,6 +207,16 @@ public extension NSData {
 }
 
 public extension String {
+    
+    /// Can be used for shorter UUIDs.
+    static func random(length: Int) -> String {
+        let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+        return String((0..<length).compactMap { _ in
+            chars.randomElement()
+        })
+    }
+
     var isValidEmail: Bool {
         let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}"
         let emailTest = NSPredicate(format: "SELF MATCHES %@", emailRegex)
@@ -326,6 +336,7 @@ public extension String {
     var trimmingWhiteSpace: String {
         return self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
+    
 }
 
 public extension Optional where Wrapped == String {
