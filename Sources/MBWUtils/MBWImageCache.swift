@@ -5,12 +5,13 @@
 //  Created by John Scalo on 10/24/22.
 //
 
-#if os(iOS)  || os(watchOS)
+#if os(iOS) || os(watchOS)
 import UIKit
 #elseif os(OSX)
 import AppKit
 #endif
 
+/// Convenience layer above NSCache. Works with cgImage-based images, but not CoreImage-based images.
 public class MBWImageCache {
     private let cache = NSCache<NSString,Image>()
     
@@ -24,11 +25,15 @@ public class MBWImageCache {
     }
     
     public func cacheImage(_ image: Image, named name: String) {
-        cache.setObject(image, forKey: name as NSString, cost: image.sizeInBytes)
+        guard let cgImage = image.cgImage else {
+            print("MBWImageCache only works with cgImage-based images.")
+            return
+        }
+        cache.setObject(image, forKey: name as NSString, cost: cgImage.bytesPerRow * cgImage.height)
     }
     
     public func imageNamed(_ name: String) -> Image? {
         return cache.object(forKey: name as NSString)
     }
-    
 }
+
