@@ -30,7 +30,8 @@ public class CoreDataManager {
     /// - Parameter dbName: the name to use for the sqlite database stored on disk
     /// - Parameter moduleName: the module (e.g. Swift package) containing the Core Data model file, if any
     /// - Note If pulling the model from a Swift package:
-    ///     * Check the actual name of the Swift package bundle. Sometimes it will be named "MyPackage_MyPackage.bundle" instead of just "MyPackage.bundle" in which case you will want to set `moduleName` to `MyPackage_MyPackage`. You can set a breakpoint and use `FileManager.enumerateContentsOfDirectory` to see the bundle name.
+    ///     * Check the actual name of the Swift package bundle. Sometimes it will be named "MyPackage_MyPackage.bundle" instead of just "MyPackage.bundle" in which case you will want to set `moduleName` to `MyPackage_MyPackage`. You can set a breakpoint and do:
+    ///         `po try? FileManager.default.contentsOfDirectory(atPath: Bundle.main.resourcePath!)`
     ///     * For each Core Data entity, be sure to set the class module to the name of the package. It won't be listed in the popup. (You'll never need the underscore version here…)
     public init(modelName: String, dbName: String, moduleName: String? = nil) {
         let modelURL: URL
