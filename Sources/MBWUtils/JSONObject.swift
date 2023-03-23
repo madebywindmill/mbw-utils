@@ -10,7 +10,11 @@ import Foundation
 public typealias JSONObject = [String:Any]
 public typealias JSONArray = [JSONObject]
 
+let gJSONObjectLock = UnfairLock()
+
 public extension JSONObject {
+    
+    /// Recursively enumerate all JSONObject values in the current JSON structure, repeatedly calling the closure `block` for each object.
     func enumerateObjects(_ block: (_ object: JSONObject)->Void) {
         for v in self.values {
             if let d = v as? JSONObject {
@@ -25,6 +29,7 @@ public extension JSONObject {
         }
     }
 
+    /// Recursively enumerate all JSONArray values in the current JSON structure, repeatedly calling the closure `block` for each object.
     func enumerateArrays(_ block: (_ array: JSONArray)->Void) {
         for v in self.values {
             if let a = v as? JSONArray {
@@ -36,6 +41,31 @@ public extension JSONObject {
                 d.enumerateArrays(block)
             }
         }
+    }
+    
+    /// Retrieve a value from a nested JSON structure by following a specified path, where the keys are separated by `/`. This works fine as long as every non-leaf node is a dictionary (`JSONObject`) but would need some updating to also support arrays (`JSONArray`). Access is thread-safe manner via a Darwin lock.
+    func getValue(at path: String) -> Any? {
+        var pathComps = path.components(separatedBy: "/")
+        var returnValue: Any?
+        
+        gJSONObjectLock.locked {
+            var currentJSON = self
+            while !pathComps.isEmpty {
+                let nextPathComp = pathComps.removeFirst()
+                if pathComps.isEmpty {
+                    returnValue = currentJSON[nextPathComp]
+                    break
+                } else {
+                    guard let nextJSON = currentJSON[nextPathComp] as? JSONObject else {
+                        print("*** not a JSON object")
+                        break
+                    }
+                    currentJSON = nextJSON
+                }
+            }
+        }
+        
+        return returnValue
     }
 }
 
