@@ -10,7 +10,7 @@ import Foundation
 public typealias JSONObject = [String:Any]
 public typealias JSONArray = [JSONObject]
 
-let gJSONObjectLock = UnfairLock()
+public let gJSONObjectLock = UnfairLock()
 
 public extension JSONObject {
     
