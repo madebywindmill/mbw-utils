@@ -9,7 +9,7 @@ import Foundation
 
 public extension Date {
     
-    static func fromISO8601String(str: String) -> Date? {
+    static func fromISO8601String(_ str: String) -> Date? {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -43,6 +43,16 @@ public extension Date {
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
         return formatter.string(from: self)
+    }
+
+    /// RFC 2616 dates are typically used in HTTP headers.
+    static func fromRFC2616String(_ str: String) -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        return dateFormatter.date(from: str)
     }
     
     func isAfterDate(_ date: Date) -> Bool {
