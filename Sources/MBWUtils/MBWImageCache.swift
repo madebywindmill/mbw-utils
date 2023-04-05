@@ -25,11 +25,20 @@ public class MBWImageCache {
     }
     
     public func cacheImage(_ image: Image, named name: String) {
+#if os(OSX)
+        var rect = NSRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+        guard let cgImage = image.cgImage(forProposedRect: &rect, context: nil, hints: nil) else {
+            print("MBWImageCache only works with cgImage-based images.")
+            return
+        }
+        cache.setObject(image, forKey: name as NSString, cost: cgImage.bytesPerRow * cgImage.height)
+#else
         guard let cgImage = image.cgImage else {
             print("MBWImageCache only works with cgImage-based images.")
             return
         }
         cache.setObject(image, forKey: name as NSString, cost: cgImage.bytesPerRow * cgImage.height)
+#endif
     }
     
     public func imageNamed(_ name: String) -> Image? {
