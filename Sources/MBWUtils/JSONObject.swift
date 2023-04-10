@@ -14,6 +14,19 @@ public let gJSONObjectLock = UnfairLock()
 
 public extension JSONObject {
     
+    func fromData(_ data: Data) throws -> JSONObject {
+        let jsonDict = try JSONSerialization.jsonObject(
+                with: data,
+                options: JSONSerialization.ReadingOptions(rawValue: 0)
+            ) as? JSONObject
+        
+        guard let jsonDict = jsonDict else {
+            throw NSError(domain: NSCocoaErrorDomain, code: NSPropertyListReadCorruptError)
+        }
+        
+        return jsonDict
+    }
+    
     /// Recursively enumerate all JSONObject values in the current JSON structure, repeatedly calling the closure `block` for each object.
     func enumerateObjects(_ block: (_ object: JSONObject)->Void) {
         for v in self.values {
