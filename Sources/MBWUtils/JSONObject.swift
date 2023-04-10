@@ -14,7 +14,7 @@ public let gJSONObjectLock = UnfairLock()
 
 public extension JSONObject {
     
-    func fromData(_ data: Data) throws -> JSONObject {
+    static func fromData(_ data: Data) throws -> JSONObject {
         let jsonDict = try JSONSerialization.jsonObject(
                 with: data,
                 options: JSONSerialization.ReadingOptions(rawValue: 0)
