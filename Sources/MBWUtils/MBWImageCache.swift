@@ -44,5 +44,9 @@ public class MBWImageCache {
     public func imageNamed(_ name: String) -> Image? {
         return cache.object(forKey: name as NSString)
     }
+    
+    public func removeImage(named name: String) {
+        cache.removeObject(forKey: name as NSString)
+    }
 }
 
