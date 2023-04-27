@@ -126,6 +126,10 @@ public extension Dictionary {
         }
     }
     
+    var jsonData: Data? {
+        return try? JSONSerialization.data(withJSONObject: self)
+    }
+    
     func prettyPrint() {
         if let str = self.jsonStr {
             print(str)
@@ -150,6 +154,10 @@ public extension Array {
                 return nil
             }
         }
+    }
+
+    var jsonData: Data? {
+        return try? JSONSerialization.data(withJSONObject: self)
     }
 
     func prettyPrint() {
