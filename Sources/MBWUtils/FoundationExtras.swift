@@ -476,6 +476,13 @@ public extension NSPointerArray {
     }
 }
 
+public extension UUID {
+    func short(prefix: String = "", length: Int = 12) -> String {
+        return "\(prefix)\(String.random(length: length))"
+    }
+
+}
+
 public func addressString(of obj: AnyObject) -> String {
     return "\(Unmanaged.passUnretained(obj).toOpaque())"
 }
