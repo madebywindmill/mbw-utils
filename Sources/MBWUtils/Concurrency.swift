@@ -142,6 +142,7 @@ public class UnfairLock {
     }
 }
 
+@available(iOS 13, macOS 12.0, *)
 public extension Sequence {
     func parallelForEach(_ block: @escaping @Sendable (Element) async throws -> ()) async rethrows {
         try await withThrowingTaskGroup(of: Void.self) { group in
