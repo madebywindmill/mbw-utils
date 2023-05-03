@@ -141,3 +141,32 @@ public class UnfairLock {
         return try f()
     }
 }
+
+public extension Sequence {
+    func parallelForEach(_ block: @escaping @Sendable (Element) async throws -> ()) async rethrows {
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for element in self {
+                group.addTask {
+                    try await block(element)
+                }
+            }
+            
+            try await group.waitForAll()
+        }
+    }
+    
+    func parallelForEach(maxTaskCnt: Int, _ block: @escaping @Sendable (Element) async throws -> ()) async rethrows {
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for (idx, element) in self.enumerated() {
+                if idx >= maxTaskCnt {
+                    try await group.next()
+                }
+                group.addTask {
+                    try await block(element)
+                }
+            }
+            
+            try await group.waitForAll()
+        }
+    }
+}
