@@ -156,7 +156,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
                 formData.close()
             }
             request.httpBody = formData.formData as Data
-            request.addValue("multipart/form-data; boundary=\(formData.formBoundary)", forHTTPHeaderField: "Content-Type")
+            request.setValue("multipart/form-data; boundary=\(formData.formBoundary)", forHTTPHeaderField: "Content-Type")
         } else {
             self.addJSONBody(payload: payload, request: &request)
         }
