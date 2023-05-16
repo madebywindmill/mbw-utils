@@ -164,7 +164,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         // Add other http header fields
         if let httpHeaders = httpHeaders {
             for (key, value) in httpHeaders as! Dictionary<String, String> {
-                request.addValue(value, forHTTPHeaderField: key)
+                request.setValue(value, forHTTPHeaderField: key)
             }
         }
         
@@ -255,11 +255,11 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         // The caller has the option of sending a property list type (dict, array) or JSON data.
         if payload is Data {
             request.httpBody = payload as? Data
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         } else {
             if let json = Data.objectToJSON(payload!) {
                 request.httpBody = json
-                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             }
         }
     }
@@ -286,7 +286,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         }
         
         request.httpBody = params.data(using: String.Encoding.ascii)
-        request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
     }
     
     private func serverInterfaceAddAuthHeaders(request: inout URLRequest) {
