@@ -325,6 +325,14 @@ public extension View {
         c.isActive = activate
         return c
     }
+    
+    /// Constrain the view's aspect ratio, where the provided ratio = height / width.
+    @discardableResult func constrainAspectRatio(_ a: CGFloat) -> NSLayoutConstraint {
+        self.autoResizeTranslationCheck()
+        let c = self.widthAnchor.constraint(equalTo: self.heightAnchor, multiplier: a)
+        c.isActive = true
+        return c
+    }
 }
 
 public extension NSLayoutConstraint {
