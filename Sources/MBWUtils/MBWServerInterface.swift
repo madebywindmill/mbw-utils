@@ -463,3 +463,9 @@ public extension Error {
         }
     }
 }
+
+public extension HTTPURLResponse {
+    var is2XX: Bool {
+        return (200...299).contains(statusCode)
+    }
+}
