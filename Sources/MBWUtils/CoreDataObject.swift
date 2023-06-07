@@ -13,7 +13,7 @@ import CoreData
 /// * Marked "abstract entity"
 /// * Has the class module set to "MBWUtils"
 /// * Has codegen set to "Manual/None"
-/// * Has an optional `id` attribute of String
+/// * Has a non-optional `id` attribute of String
 open class CoreDataObject: NSManagedObject {
     
     @NSManaged open var id: IDType
