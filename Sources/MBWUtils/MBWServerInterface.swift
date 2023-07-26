@@ -426,6 +426,15 @@ public class MBWServerInterfaceError: NSError {
     static public let domain = "MBWServerInterfaceError"
     static public let httpDomain = "MBWServerInterfacHTTPErrorDomain"
 
+    // NSErrors by default are not equal if the description is different.
+    public override func isEqual(_ object: Any?) -> Bool {
+        if let othererror = object as? MBWServerInterfaceError {
+            return othererror.code == self.code && othererror.domain == domain
+        } else {
+            return false
+        }
+    }
+    
     @objc(MBWServerInterfaceErrorCodes) public enum Codes: Int {
         case unknown, invalidConfiguration
     }
