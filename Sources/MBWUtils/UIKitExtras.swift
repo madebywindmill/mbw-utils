@@ -1020,3 +1020,7 @@ public extension UIPasteboard {
 }
 
 #endif
+
+public enum DiffableDatasourceGenericSection: Int {
+    case main = 0
+}
