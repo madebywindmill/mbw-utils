@@ -248,6 +248,9 @@ public extension String {
     }
     
     func substring(_ range: Range<Int>) -> String {
+        guard range.lowerBound >= 0 else {
+            print("lowerBound is negative."); return ""
+        }
         guard range.lowerBound < self.count else {
             print("lowerBound is out of range."); return ""
         }
@@ -268,6 +271,9 @@ public extension String {
     }
 
     func substring(_ range: PartialRangeFrom<Int>) -> String {
+        guard range.lowerBound >= 0 else {
+            print("lowerBound is negative."); return ""
+        }
         guard range.lowerBound < self.count else {
             print("lowerBound is out of range."); return ""
         }
