@@ -247,6 +247,39 @@ public extension String {
         return Set(self).isSubset(of: nums)
     }
     
+    func substring(_ range: Range<Int>) -> String {
+        guard range.lowerBound < self.count else {
+            print("lowerBound is out of range."); return ""
+        }
+        guard range.upperBound <= self.count else {
+            print("upperBound is out of range."); return ""
+        }
+        guard range.upperBound > 0 else {
+            print("upperBound is out of range."); return ""
+        }
+        guard range.lowerBound != range.upperBound else {
+            print("lowerBound is the same as upperBound."); return ""
+        }
+        
+        let startIndex = self.index(self.startIndex, offsetBy: range.lowerBound)
+        let endIndex = self.index(self.startIndex, offsetBy: range.upperBound)
+        
+        return String(self[startIndex ..< endIndex])
+    }
+
+    func substring(_ range: PartialRangeFrom<Int>) -> String {
+        guard range.lowerBound < self.count else {
+            print("lowerBound is out of range."); return ""
+        }
+        
+        let startIndex = self.index(self.startIndex, offsetBy: range.lowerBound)
+        let endIndex = self.index(self.startIndex, offsetBy: self.count)
+        
+        return String(self[startIndex ..< endIndex])
+    }
+
+    /// Warning: this parameter naming here isn't great. The `to` is "up to AND including". E.g. the 2nd character would be `str.substring(from: 1, to: 1)`.
+    @available(*, deprecated, message: "Use substring(_ range:) instead.")
     func substring(from: Int?, to: Int?) -> String {
         if let start = from {
             guard start < self.count else {
@@ -283,14 +316,18 @@ public extension String {
         return String(self[startIndex ..< endIndex])
     }
     
+    @available(*, deprecated, message: "Use substring(_ range:) instead.")
     func substring(from: Int) -> String {
         return self.substring(from: from, to: nil)
     }
     
+    /// Warning: this parameter naming here isn't great. The `to` is "up to AND including". E.g. the 1st character would be `str.substring(to: 0)`.
+    @available(*, deprecated, message: "Use substring(_ range:) instead.")
     func substring(to: Int) -> String {
         return self.substring(from: nil, to: to)
     }
-    
+        
+    @available(*, deprecated, message: "Use substring(_ range:) instead.")
     func substring(from: Int?, length: Int) -> String {
         guard length > 0 else {
             return ""
@@ -306,6 +343,7 @@ public extension String {
         return self.substring(from: from, to: end)
     }
     
+    @available(*, deprecated, message: "Use substring(_ range:) instead.")
     func substring(length: Int, to: Int?) -> String {
         guard let end = to, end > 0, length > 0 else {
             return ""
@@ -321,6 +359,14 @@ public extension String {
         return self.substring(from: start, to: to)
     }
     
+    func firstNCharacters(_ n: Int) -> String {
+        return substring(0..<n)
+    }
+    
+    func lastNCharacters(_ n: Int) -> String {
+        return substring((self.count - n)...)
+    }
+
     func index(offset: Int) -> String.Index {
         return self.index(self.startIndex, offsetBy: offset)
     }
