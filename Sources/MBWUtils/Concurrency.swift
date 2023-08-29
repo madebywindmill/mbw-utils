@@ -171,3 +171,23 @@ public extension Sequence {
         }
     }
 }
+
+/// This is handy for creating concurrency-safe local arrays and dictionaries, for which it can be used to store either or both.
+/// Ex:
+///   let store = CollectionStore()
+///   await store.append("hello")
+///   await store.set(value: "value", key: "key")
+///   let localArray = await store.a
+///   let localDictionary = await store.d
+public actor IsolatedCollectionStore {
+    public var a = [Any]()
+    public var d = [AnyHashable:Any]()
+    
+    public func append(_ e: Any) {
+        a.append(e)
+    }
+    
+    public func set(value: Any, key: AnyHashable) {
+        d[key] = value
+    }
+}
