@@ -97,7 +97,7 @@ open class CoreDataObject: NSManagedObject {
     }
     
     /// async/await-safe version of the above
-    @available(iOS 13, macOS 11.0, *)
+    @available(iOS 13, macOS 12.0, watchOS 6, *)
     @discardableResult open func insertOrUpdate(saveContext: Bool = true) async throws -> (CoreDataObject?, Bool /* wasCreated */) {
         @MainActor func insertMain() -> (CoreDataObject?, Bool /* wasCreated */, Error?) {
             return insertOrUpdate(saveContext: saveContext)
@@ -127,7 +127,7 @@ open class CoreDataObject: NSManagedObject {
     }
     
     /// async/await-safe version of the above
-    @available(iOS 13, macOS 11.0, *)
+    @available(iOS 13, macOS 12.0, watchOS 6, *)
     open func deleteObject(saveContext: Bool = true) async throws {
         @MainActor func deleteMain() -> Error? {
             return deleteObject(saveContext: saveContext)

@@ -415,7 +415,7 @@ public extension Optional where Wrapped == String {
     }
 }
 
-@available(iOS 13, macOS 11.0, *)
+@available(iOS 13, macOS 12.0, watchOS 6, *)
 @available(iOS, deprecated: 15.0, message: "Use the built-in API instead")
 @available(macOS, deprecated: 12.0, message: "Use the built-in API instead")
 public extension URLSession {

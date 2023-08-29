@@ -142,7 +142,7 @@ public class UnfairLock {
     }
 }
 
-@available(iOS 13, macOS 12.0, *)
+@available(iOS 13, macOS 12.0, watchOS 6, *)
 public extension Sequence {
     func parallelForEach(_ block: @escaping @Sendable (Element) async throws -> ()) async rethrows {
         try await withThrowingTaskGroup(of: Void.self) { group in
@@ -179,6 +179,7 @@ public extension Sequence {
 ///   await store.set(value: "value", key: "key")
 ///   let localArray = await store.a
 ///   let localDictionary = await store.d
+@available(iOS 13, macOS 12.0, watchOS 6, *)
 public actor IsolatedCollectionStore {
     public var a = [Any]()
     public var d = [AnyHashable:Any]()

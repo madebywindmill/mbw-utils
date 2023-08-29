@@ -65,7 +65,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         self.accessToken = accessToken
     }
     
-    @available(iOS 13.0.0, macOS 12.0.0, *)
+    @available(iOS 13, macOS 12.0, watchOS 6, *)
     @discardableResult public func sendRequest(endpoint: String,
                      payload: Any!,
                      httpHeaders: [String:Any]? = nil,

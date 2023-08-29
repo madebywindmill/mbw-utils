@@ -114,7 +114,7 @@ public class CoreDataManager {
     }
     
     /// async/await-safe version of the above
-    @available(iOS 13, macOS 11.0, *)
+    @available(iOS 13, macOS 12.0, watchOS 6, *)
     open func save() async throws {
         @MainActor func saveMain() -> Error? {
             return save()
