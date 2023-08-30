@@ -95,23 +95,43 @@ open class CoreDataObject: NSManagedObject {
         }
         return (managedObject, wasCreated, nil)
     }
-    
-    /// async/await-safe version of the above
+        
+    /// async/await version of the above
     @available(iOS 13, macOS 12.0, watchOS 6, *)
-    @discardableResult open func insertOrUpdate(saveContext: Bool = true) async throws -> (CoreDataObject?, Bool /* wasCreated */) {
+    @MainActor @discardableResult open func insertOrUpdate(saveContext: Bool = true) async throws -> (CoreDataObject?, Bool /* wasCreated */) {
+
+        let managedObject: CoreDataObject
+        var wasCreated = false
+        if let existing = Self.fetch(id: id) {
+            CoreDataManager.current.update(managedObject: existing, with: self)
+            managedObject = existing
+        } else {
+            wasCreated = true
+            CoreDataManager.current.mainContext.insert(self)
+            managedObject = self
+        }
+        if saveContext {
+            try await CoreDataManager.current.save()
+        }
+        return (managedObject, wasCreated)
+    }
+
+    /// A version of the above that can be called from a non-main thread. (This should probably go away.)
+    @available(iOS 13, macOS 12.0, watchOS 6, *)
+    @discardableResult open func insertOrUpdateFromNonMainThread(saveContext: Bool = true) async throws -> (CoreDataObject?, Bool /* wasCreated */) {
         @MainActor func insertMain() -> (CoreDataObject?, Bool /* wasCreated */, Error?) {
             return insertOrUpdate(saveContext: saveContext)
         }
 
         let (o, b, e) = await insertMain()
-        
+
         if let e = e {
             throw e
         } else {
             return (o, b)
         }
     }
-    
+
     /// Delete this object from the store and optionally save the context.
     /// - Parameter saveContext: Whether to save the context after inserting. When updating many objects one after the other, set to false and save the context when finished.
     /// - Returns: An optional error.
