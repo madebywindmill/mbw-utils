@@ -353,6 +353,18 @@ public extension UIView {
 }
 
 public extension UIViewController {
+    
+    var statusBarSize: CGSize {
+        if #available(iOS 13.0, *) {
+            guard let sbm = view.window?.windowScene?.statusBarManager else {
+                return CGSize.zero
+            }
+            return sbm.statusBarFrame.size
+        } else {
+            return UIApplication.shared.statusBarFrame.size
+        }
+    }
+    
     func addAsChild(parentVC: UIViewController, containerView: UIView) {
         parentVC.addChild(self)
         let view = self.view!.forAutoLayout()
