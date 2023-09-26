@@ -211,7 +211,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
             // Treat http status codes above 300 as errors
             if httpResponse.statusCode >= 300 {
                 
-                if self.shouldDebugLog {
+                if self.enableDebugLogging {
                     Logger.fileLog("*** server returned \(httpResponse.statusCode)")
                     if let data = data {
                         if let rawString = String(data: data, encoding: String.Encoding.utf8) {
@@ -300,17 +300,9 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
             request.setValue("Basic \(str)", forHTTPHeaderField: "Authorization")
         }
     }
-    
-    private var shouldDebugLog: Bool {
-        var isDebugBuild = false
-        #if DEBUG
-        isDebugBuild = true
-        #endif
-        return isDebugBuild || enableDebugLogging
-    }
-    
+        
     private func debugLog(_ str: String) {
-        if !shouldDebugLog {
+        if !enableDebugLogging {
             return
         }
         var strCopy = str
