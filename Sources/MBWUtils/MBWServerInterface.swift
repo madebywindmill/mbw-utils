@@ -44,10 +44,10 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
     
     open var baseURL: URL!
     
+    open var logOptions: [LogOption] = [.error, .endpoint]
+    
     // Set for Bearer Token auth
     public var accessToken: String?
-
-    open var enableDebugLogging = false
     
     // Set regex replacements here to redact private data in the logs.
     // E.g.: ["\"phoneNum\" : \".*\"": "\"phoneNum\" : \"<private>\""]
@@ -134,7 +134,9 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         url = url?.appending(queryPairs: queryPairs)
         
         if url == nil {
-            Logger.fileLog("*** Couldn't create URL. Bad chars?")
+            if self.hasLogOption(.error) {
+                Logger.fileLog("*** Couldn't create URL. Bad chars?")
+            }
             actualCompletion?(nil, nil, MBWServerInterfaceError(code: .unknown))
             return
         }
@@ -171,9 +173,8 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         // We might want to use a custom URLSession
         let session = URLSession(configuration: URLSessionConfiguration.default, delegate: self, delegateQueue: nil)
         
-        debugLog(request.fullDescription())
         if let formData = payload as? MBWServerInterfaceFormData {
-            debugLog("FORM DATA: \(formData.description)")
+            debugLog("FORM DATA: \(formData.description)", logType: .responseBody)
         }
         
         // Set up the task
@@ -186,7 +187,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
             
             let httpResponse = response as! HTTPURLResponse
             
-            self.debugLog("⬇️ \(httpResponse.statusCode) returned for \(request.url!)")
+            self.debugLog("⬇️ \(httpResponse.statusCode) returned for \(request.url!)", logType: .endpoint)
             
             var jsonDict: JSONObject?
             if let data = data {
@@ -198,22 +199,22 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
                 }
                 if let jsonDict = jsonDict {
                     let jsonStr = jsonDict.jsonStr ?? "<null>"
-                    self.debugLog("⬇️ JSON response:\n\(jsonStr)")
+                    self.debugLog("⬇️ JSON response:\n\(jsonStr)", logType: .responseBody)
                 } else {
-                    self.debugLog("⬇️ Response not a JSON object")
+                    self.debugLog("⬇️ Response not a JSON object", logType: .error)
                     // Not a dictionary and not an array, so drop back and insert the raw data.
                     jsonDict = [MBWServerInterface.insertedDataKey: data]
                 }
             } else {
-                self.debugLog("⬇️ Response data was empty")
+                self.debugLog("⬇️ Response data was empty", logType: .endpoint)
             }
             
             // Treat http status codes above 300 as errors
             if httpResponse.statusCode >= 300 {
                 
-                if self.enableDebugLogging {
+                if self.hasLogOption(.error) {
                     Logger.fileLog("*** server returned \(httpResponse.statusCode)")
-                    if let data = data {
+                    if let data = data, self.hasLogOption(.responseBody) {
                         if let rawString = String(data: data, encoding: String.Encoding.utf8) {
                             Logger.fileLog("*** raw response string: \(rawString)")
                         }
@@ -227,15 +228,17 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
             actualCompletion?(jsonDict, httpResponse, nil)
         }
         
-        // And start it
-        debugLog("⬆️ requesting: \(httpMethod.rawValue) \(request.url!)")
+        if let str = request.descriptionForLoggingOptions(logOptions) {
+            debugLog(str, logType: .all /* ignored because of force */, force: true)
+        }
         
+        // And start it
         task.resume()
     }
     
     // Redirects will strip our auth header. Re-add it here.
     public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
-        debugLog("➡️ redirecting: \(String(describing: request.url))")
+        debugLog("➡️ redirecting: \(String(describing: request.url))", logType: .endpoint)
         if request.allHTTPHeaderFields?["rToken"] != nil && request.allHTTPHeaderFields?["Authorization"] == nil {
             
             var newRequest = URLRequest(url: request.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: serverInterfaceAPITimeout)
@@ -301,44 +304,6 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         }
     }
         
-    private func debugLog(_ str: String) {
-        if !enableDebugLogging {
-            return
-        }
-        var strCopy = str
-        for (key, val) in self.debugLoggingRegexReplacements {
-            strCopy = strCopy.replacingOccurrences(
-                of: key,
-                with: val,
-                options: .regularExpression)
-        }
-        Logger.fileLog(strCopy)
-    }
-}
-
-public extension URLRequest {
-    func fullDescription() -> String {
-        var s = "\n---\n"
-        if let url = self.url, let method = self.httpMethod {
-            s += ("\(method): \(url)\n")
-        }
-        if let data = self.httpBody, let str = String(data: data, encoding: .utf8) {
-            s += ("BODY: \(str)\n")
-        }
-        if let headers = self.allHTTPHeaderFields {
-            s += "HEADERS: "
-            for (key,value) in headers {
-                s += "[\(key): \(value)] "
-            }
-            s += "\n"
-        }
-        s += "---\n"
-        return s
-    }
-    
-    func printFullDescription() {
-        print(self.fullDescription())
-    }
 }
 
 public extension URL {

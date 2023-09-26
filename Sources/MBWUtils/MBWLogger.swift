@@ -11,7 +11,17 @@ private let mbwLoggerQ = DispatchQueue(label: "MBWLoggerQueue")
 
 public class Logger {
 
-    public class func log(_ str: String, file: String = #file, line: Int = #line, function: String = #function) {
+    public enum Options {
+        case noFileInfo
+    }
+    
+    public class func log(
+        _ str: String,
+        file: String = #file,
+        line: Int = #line,
+        function: String = #function,
+        options: [Options] = []
+    ) {
         #if DEBUG
         let shortenedFile = file.components(separatedBy: "/").last ?? ""
         let s = "[\(shortenedFile):\(function):\(line)] \(str)"
@@ -39,9 +49,19 @@ public class Logger {
     public static var snipInterval: TimeInterval = 3600
     
     private static let formatter = DateFormatter()
-    public class func fileLog(_ str: String, file: String = #file, line: Int = #line, function: String = #function, debugOnly: Bool = false) {
+    public class func fileLog(
+        _ str: String,
+        file: String = #file,
+        line: Int = #line,
+        function: String = #function,
+        options: [Options] = [],
+        debugOnly: Bool = false
+    ) {
         
-        let shortenedFile = file.components(separatedBy: "/").last ?? ""
+        var shortenedFile: String?
+        if !options.contains(.noFileInfo) {
+            shortenedFile = file.components(separatedBy: "/").last
+        }
         
         #if UNIT_TEST
         self.log(str, file: shortenedFile, line: line, function: function)
@@ -61,9 +81,18 @@ public class Logger {
         if formatter.dateFormat != "yyyy-MM-dd HH:mm:ss ZZZ" {
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
         }
-        let dateStr = formatter.string(from: Date())
-        let s = "\(dateStr) [\(shortenedFile):\(function):\(line)] \(str)"
-        let strForNSLog = "[\(shortenedFile):\(function):\(line)] \(str)"
+        
+        let s: String
+        let strForNSLog: String
+        
+        if !options.contains(.noFileInfo), let shortenedFile = shortenedFile {
+            let dateStr = formatter.string(from: Date())
+            s = "\(dateStr) [\(shortenedFile):\(function):\(line)] \(str)"
+            strForNSLog = "[\(shortenedFile):\(function):\(line)] \(str)"
+        } else {
+            s = "\(str)"
+            strForNSLog = "\(str)"
+        }
         NSLog("%@", strForNSLog)
         
         mbwLoggerQ.async {
