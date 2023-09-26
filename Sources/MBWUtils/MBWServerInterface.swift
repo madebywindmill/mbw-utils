@@ -47,7 +47,7 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
     // Set for Bearer Token auth
     public var accessToken: String?
 
-    public var enableDebugLogging = false
+    open var enableDebugLogging = false
     
     // Set regex replacements here to redact private data in the logs.
     // E.g.: ["\"phoneNum\" : \".*\"": "\"phoneNum\" : \"<private>\""]
