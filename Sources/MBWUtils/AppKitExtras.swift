@@ -109,6 +109,18 @@ public extension NSImage {
         return bitmapRep.representation(using: NSBitmapImageRep.FileType.jpeg, properties: [.compressionFactor:compressionQuality])
     }
     
+    func pngData() -> Data? {
+        guard let tiffRepresentation = self.tiffRepresentation else {
+            return nil
+        }
+
+        guard let bitmapImageRep = NSBitmapImageRep(data: tiffRepresentation) else {
+            return nil
+        }
+
+        return bitmapImageRep.representation(using: .png, properties: [:])
+    }
+
     // Returns optional to conform with UIImage.resize(targetSizePx:)
     func resize(targetSizePx: CGSize) -> NSImage? {
         let size = self.size
