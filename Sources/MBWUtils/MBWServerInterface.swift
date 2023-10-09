@@ -247,6 +247,8 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
             newRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
             self.serverInterfaceAddAuthHeaders(request: &newRequest)
             completionHandler(newRequest)
+        } else {
+            completionHandler(request)
         }
     }
     
