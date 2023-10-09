@@ -239,8 +239,8 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
     // Redirects will strip our auth header. Re-add it here.
     public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         debugLog("➡️ redirecting: \(String(describing: request.url))", logType: .endpoint)
-        if request.allHTTPHeaderFields?["rToken"] != nil && request.allHTTPHeaderFields?["Authorization"] == nil {
-            
+        
+        if request.allHTTPHeaderFields?["Authorization"] == nil {
             var newRequest = URLRequest(url: request.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: serverInterfaceAPITimeout)
             newRequest.httpBody = request.httpBody
             newRequest.httpMethod = request.httpMethod
