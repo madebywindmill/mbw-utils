@@ -381,7 +381,7 @@ public extension String {
         return self.components(separatedBy: characterSet).joined(separator: string)
     }
 
-    var trimmedWhitespace: String {
+    var trimmingWhitespace: String {
         return self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
 
@@ -401,10 +401,6 @@ public extension String {
             return nil
         }
         return String(data: data, encoding: .utf8)
-    }
-
-    var trimmingWhiteSpace: String {
-        return self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
     
 }
