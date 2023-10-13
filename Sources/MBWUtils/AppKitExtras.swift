@@ -11,13 +11,48 @@ import AppKit
 
 public extension NSColor {
     var hex3String: String {
-       let components = self.cgColor.components
-       let r: CGFloat = components?[0] ?? 0.0
-       let g: CGFloat = components?[1] ?? 0.0
-       let b: CGFloat = components?[2] ?? 0.0
-
-       let hexString = String.init(format: "%02lX%02lX%02lX", lroundf(Float(r * 255)), lroundf(Float(g * 255)), lroundf(Float(b * 255)))
-       return hexString
+        guard let colorSpace = self.cgColor.colorSpace else {
+            assertionFailure("couldn't get colorSpace")
+            return "000000"
+        }
+        guard let components = self.cgColor.components else {
+            assertionFailure("couldn't get color components")
+            return "000000"
+        }
+        
+        switch colorSpace.model {
+            case .rgb:
+                guard components.count >= 3 else {
+                    assertionFailure("unexpected number of color components")
+                    return "000000"
+                }
+                let r: CGFloat = components[0]
+                let g: CGFloat = components[1]
+                let b: CGFloat = components[2]
+                return String(
+                    format: "%02lX%02lX%02lX",
+                    lroundf(Float(r * 255)),
+                    lroundf(Float(g * 255)),
+                    lroundf(Float(b * 255))
+                )
+                
+            case .monochrome:
+                guard components.count >= 1 else {
+                    assertionFailure("unexpected number of color components")
+                    return "000000"
+                }
+                let white: CGFloat = components[0]
+                return String(
+                    format: "%02lX%02lX%02lX",
+                    lroundf(Float(white * 255)),
+                    lroundf(Float(white * 255)),
+                    lroundf(Float(white * 255))
+                )
+                
+            default:
+                assertionFailure("unknown colorspace: \(colorSpace.model)")
+                return "000000"
+        }
     }
     
     convenience init(hex3: Int) {
@@ -36,14 +71,28 @@ public extension NSColor {
     }
     
     var hex4String: String {
-       let components = self.cgColor.components
-       let r: CGFloat = components?[0] ?? 0.0
-       let g: CGFloat = components?[1] ?? 0.0
-       let b: CGFloat = components?[2] ?? 0.0
-       let a: CGFloat = components?[3] ?? 0.0
+        guard let components = self.cgColor.components else {
+            assertionFailure("couldn't get color components")
+            return "000000"
+        }
+        
+        guard components.count >= 4 else {
+            assertionFailure("unexpected number of color components")
+            return "000000"
+        }
 
-        let hexString = String.init(format: "%02lX%02lX%02lX%02lX", lroundf(Float(r * 255)), lroundf(Float(g * 255)), lroundf(Float(b * 255)), lroundf(Float(a * 255)))
-       return hexString
+        let r: CGFloat = components[0]
+        let g: CGFloat = components[1]
+        let b: CGFloat = components[2]
+        let a: CGFloat = components[3]
+        
+        return String.init(
+            format: "%02lX%02lX%02lX%02lX",
+            lroundf(Float(r * 255)),
+            lroundf(Float(g * 255)),
+            lroundf(Float(b * 255)),
+            lroundf(Float(a * 255))
+        )
     }
 
     convenience init(hex4: Int) {
