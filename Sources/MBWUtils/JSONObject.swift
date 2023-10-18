@@ -14,6 +14,27 @@ public let gJSONObjectLock = UnfairLock()
 
 public extension JSONObject {
     
+    init?(string: String) {
+        guard let data = string.data(using: .utf8) else { return nil }
+        self.init(data: data)
+    }
+    
+    init?(data: Data) {
+        do {
+            guard let json = try JSONSerialization.jsonObject(
+                    with: data,
+                    options: JSONSerialization.ReadingOptions(rawValue: 0)
+            ) as? JSONObject else {
+                return nil
+            }
+            self = json
+        } catch {
+            Logger.log("*** error from JSONSerialization: \(error)")
+            return nil
+        }
+    }
+    
+    // This should probably be deprecated in favor of init(data:).
     static func fromData(_ data: Data) throws -> JSONObject {
         let jsonDict = try JSONSerialization.jsonObject(
                 with: data,
