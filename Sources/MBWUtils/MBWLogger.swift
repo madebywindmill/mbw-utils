@@ -82,15 +82,15 @@ public class Logger {
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
         }
         
+        let dateStr = formatter.string(from: Date())
         let s: String
         let strForNSLog: String
         
         if !options.contains(.noFileInfo), let shortenedFile = shortenedFile {
-            let dateStr = formatter.string(from: Date())
             s = "\(dateStr) [\(shortenedFile):\(function):\(line)] \(str)"
             strForNSLog = "[\(shortenedFile):\(function):\(line)] \(str)"
         } else {
-            s = "\(str)"
+            s = "\(dateStr) \(str)"
             strForNSLog = "\(str)"
         }
         NSLog("%@", strForNSLog)
