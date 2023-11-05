@@ -23,6 +23,14 @@ public extension UIApplication {
 
         return icon
     }
+    
+    var sceneKeyWindow: UIWindow? {
+        return UIApplication.shared.windows.first(where: { $0.isKeyWindow })
+    }
+    
+    var sceneKeyViewController: UIViewController? {
+        return sceneKeyWindow?.rootViewController
+    }
 }
 
 public class SFSymbolsFixButton: UIButton {
