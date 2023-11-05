@@ -31,6 +31,15 @@ public extension UIApplication {
     var sceneKeyViewController: UIViewController? {
         return sceneKeyWindow?.rootViewController
     }
+    
+    var firstSceneStatusBarFrame: CGRect? {
+        if #available(iOS 13.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            return windowScene?.statusBarManager?.statusBarFrame
+        } else {
+            return UIApplication.shared.statusBarFrame
+        }
+    }
 }
 
 public class SFSymbolsFixButton: UIButton {
