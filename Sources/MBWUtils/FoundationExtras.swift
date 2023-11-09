@@ -270,6 +270,23 @@ public extension String {
         return String(self[startIndex ..< endIndex])
     }
 
+    func substring(_ range: ClosedRange<Int>) -> String {
+        guard range.lowerBound >= 0 else {
+            print("lowerBound is negative."); return ""
+        }
+        guard range.lowerBound < self.count else {
+            print("lowerBound is out of range."); return ""
+        }
+        guard range.upperBound < self.count else {
+            print("upperBound is out of range."); return ""
+        }
+
+        let startIndex = self.index(self.startIndex, offsetBy: range.lowerBound)
+        let endIndex = self.index(self.startIndex, offsetBy: range.upperBound + 1)
+
+        return String(self[startIndex..<endIndex])
+    }
+    
     func substring(_ range: PartialRangeFrom<Int>) -> String {
         guard range.lowerBound >= 0 else {
             print("lowerBound is negative."); return ""
