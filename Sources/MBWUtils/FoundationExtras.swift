@@ -169,6 +169,17 @@ public extension Array {
     }
 }
 
+public extension Array where Element: Equatable {
+    func containsAnyOf(_ elements: [Element]) -> Bool {
+        for element in elements {
+            if self.contains(element) {
+                return true
+            }
+        }
+        return false
+    }
+}
+
 public extension Data {
     static func objectToJSON(_ object: Any) -> Data? {
         var jsonData: Data?
