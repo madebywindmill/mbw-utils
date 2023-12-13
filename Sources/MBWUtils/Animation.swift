@@ -6,9 +6,12 @@
 //
 
 #if os(iOS)
-
 import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
+#if os(iOS)
 public extension UIView {
 
     func doIncorrectAttemptShakeAnimation() {
@@ -105,4 +108,81 @@ public extension UIView {
     }
 }
 
-#endif
+#endif // extension UIView
+
+public class MBWSpringAnimation: CASpringAnimation {
+    var completion: ( () -> Void )?
+}
+
+public extension CALayer {
+    /// Note that `completion` is only called if the animation completes with no interruptions (like another `springAnimateTo` call).
+    @discardableResult func springAnimateTo(position newPosition: CGPoint, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
+        let fromValue = position
+        position = newPosition
+        
+        let anim = springAnimationFor(keyPath: "position", fromValue: fromValue, toValue: newPosition, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
+        add(anim, forKey: "positionSpringAnimation")
+        return anim
+    }
+    
+    /// Note that `completion` is only called if the animation completes with no interruptions (like another `springAnimateTo` call).
+    @discardableResult func springAnimateTo(bounds newBounds: CGRect, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
+        let fromValue = bounds
+        bounds = newBounds
+        
+        let anim = springAnimationFor(keyPath: "bounds", fromValue: fromValue, toValue: newBounds, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
+        add(anim, forKey: "boundsSpringAnimation")
+        return anim
+    }
+
+    /// Note that `completion` is only called if the animation completes with no interruptions (like another `springAnimateTo` call).
+    @discardableResult func springAnimateTo(opacity newOpacity: Float, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
+        let fromValue = opacity
+        opacity = newOpacity
+        
+        let anim = springAnimationFor(keyPath: "opacity", fromValue: fromValue, toValue: newOpacity, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
+        add(anim, forKey: "opacitySpringAnimation")
+        return anim
+    }
+    
+    /// Note that `completion` is only called if the animation completes with no interruptions (like another `springAnimateTo` call).
+    @discardableResult func springAnimateTo(transform newTransform: CATransform3D, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
+        let fromValue = transform
+        transform = newTransform
+        
+        let anim = springAnimationFor(keyPath: "transform", fromValue: fromValue, toValue: newTransform, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
+        add(anim, forKey: "transformSpringAnimation")
+        return anim
+    }
+    
+    /// Note that `completion` is only called if the animation completes with no interruptions (like another `springAnimateTo` call).
+    @discardableResult func springAnimationFor(keyPath: String, fromValue: Any, toValue: Any, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
+        let springAnimation = MBWSpringAnimation(keyPath: keyPath)
+        springAnimation.completion = completion
+        springAnimation.delegate = self
+        
+        // Animation basics
+        springAnimation.fromValue = fromValue
+        springAnimation.toValue = toValue
+        springAnimation.duration = springAnimation.settlingDuration
+
+        // Spring properties
+        springAnimation.damping = damping
+        springAnimation.stiffness = stiffness
+        springAnimation.mass = 1.0
+        springAnimation.initialVelocity = initialVelocity
+        
+        return springAnimation
+    }
+}
+
+extension CALayer: CAAnimationDelegate {
+    /// Used with the `springAnimate` functions above.
+    public func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        // Only call completion if the animation actually finished.
+        if let springAnim = anim as? MBWSpringAnimation, flag == true {
+            springAnim.completion?()
+        }
+    }
+    
+}
