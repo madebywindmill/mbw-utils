@@ -118,7 +118,12 @@ public extension CALayer {
     /// Note that `completion` is only called if the animation completes with no interruptions (like another `springAnimateTo` call).
     @discardableResult func springAnimateTo(position newPosition: CGPoint, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
         let fromValue = position
+
+        // block to disable implicit animations
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
         position = newPosition
+        CATransaction.commit()
         
         let anim = springAnimationFor(keyPath: "position", fromValue: fromValue, toValue: newPosition, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
         add(anim, forKey: "positionSpringAnimation")
@@ -127,18 +132,30 @@ public extension CALayer {
     
     /// Note that `completion` is only called if the animation completes with no interruptions (like another `springAnimateTo` call).
     @discardableResult func springAnimateTo(bounds newBounds: CGRect, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
-        let fromValue = bounds
-        bounds = newBounds
         
+        let fromValue = bounds
+
+        // block to disable implicit animations
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        bounds = newBounds
+        CATransaction.commit()
+
         let anim = springAnimationFor(keyPath: "bounds", fromValue: fromValue, toValue: newBounds, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
         add(anim, forKey: "boundsSpringAnimation")
+        
         return anim
     }
 
     /// Note that `completion` is only called if the animation completes with no interruptions (like another `springAnimateTo` call).
     @discardableResult func springAnimateTo(opacity newOpacity: Float, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
         let fromValue = opacity
+
+        // block to disable implicit animations
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
         opacity = newOpacity
+        CATransaction.commit()
         
         let anim = springAnimationFor(keyPath: "opacity", fromValue: fromValue, toValue: newOpacity, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
         add(anim, forKey: "opacitySpringAnimation")
@@ -148,7 +165,12 @@ public extension CALayer {
     /// Note that `completion` is only called if the animation completes with no interruptions (like another `springAnimateTo` call).
     @discardableResult func springAnimateTo(transform newTransform: CATransform3D, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
         let fromValue = transform
+
+        // block to disable implicit animations
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
         transform = newTransform
+        CATransaction.commit()
         
         let anim = springAnimationFor(keyPath: "transform", fromValue: fromValue, toValue: newTransform, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
         add(anim, forKey: "transformSpringAnimation")
