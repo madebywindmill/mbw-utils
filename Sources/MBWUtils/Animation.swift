@@ -119,11 +119,9 @@ public extension CALayer {
     @discardableResult func springAnimateTo(position newPosition: CGPoint, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
         let fromValue = position
 
-        // block to disable implicit animations
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        position = newPosition
-        CATransaction.commit()
+        noAnimate {
+            position = newPosition
+        }
         
         let anim = springAnimationFor(keyPath: "position", fromValue: fromValue, toValue: newPosition, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
         add(anim, forKey: "positionSpringAnimation")
@@ -135,11 +133,9 @@ public extension CALayer {
         
         let fromValue = bounds
 
-        // block to disable implicit animations
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        bounds = newBounds
-        CATransaction.commit()
+        noAnimate {
+            bounds = newBounds
+        }
 
         let anim = springAnimationFor(keyPath: "bounds", fromValue: fromValue, toValue: newBounds, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
         add(anim, forKey: "boundsSpringAnimation")
@@ -151,11 +147,9 @@ public extension CALayer {
     @discardableResult func springAnimateTo(opacity newOpacity: Float, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
         let fromValue = opacity
 
-        // block to disable implicit animations
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        opacity = newOpacity
-        CATransaction.commit()
+        noAnimate {
+            opacity = newOpacity
+        }
         
         let anim = springAnimationFor(keyPath: "opacity", fromValue: fromValue, toValue: newOpacity, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
         add(anim, forKey: "opacitySpringAnimation")
@@ -166,11 +160,9 @@ public extension CALayer {
     @discardableResult func springAnimateTo(transform newTransform: CATransform3D, damping: CGFloat = 100.0, stiffness: CGFloat = 400, initialVelocity: CGFloat = 0.0, completion: (()->Void)? = nil) -> MBWSpringAnimation {
         let fromValue = transform
 
-        // block to disable implicit animations
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        transform = newTransform
-        CATransaction.commit()
+        noAnimate {
+            transform = newTransform
+        }
         
         let anim = springAnimationFor(keyPath: "transform", fromValue: fromValue, toValue: newTransform, damping: damping, stiffness: stiffness, initialVelocity: initialVelocity, completion: completion)
         add(anim, forKey: "transformSpringAnimation")
@@ -195,6 +187,13 @@ public extension CALayer {
         springAnimation.initialVelocity = initialVelocity
         
         return springAnimation
+    }
+    
+    func noAnimate(block: ()->()) {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        block()
+        CATransaction.commit()
     }
 }
 
