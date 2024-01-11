@@ -5,7 +5,7 @@
 //  Copyright © 2018-2022 Made by Windmill. All rights reserved.
 //
 
-#if os(iOS)
+#if os(iOS) || os(watchOS)
 import UIKit
 #elseif os(macOS)
 import AppKit
