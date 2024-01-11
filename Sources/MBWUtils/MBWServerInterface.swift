@@ -202,8 +202,14 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
                     self.debugLog("⬇️ JSON response:\n\(jsonStr)", logType: .responseBody)
                 } else {
                     self.debugLog("⬇️ Response not a JSON object", logType: .error)
-                    // Not a dictionary and not an array, so drop back and insert the raw data.
-                    jsonDict = [MBWServerInterface.insertedDataKey: data]
+                    // Don't add a 0-length data object to the json, otherwise JSONSerialization tends to crash!
+                    if data.count > 0 {
+                        // Not a dictionary and not an array, so drop back and insert the raw data.
+                        jsonDict = [MBWServerInterface.insertedDataKey: data]
+                    } else {
+                        self.debugLog("⬇️ Ignoring 0-length data", logType: .error)
+                        jsonDict = nil
+                    }
                 }
             } else {
                 self.debugLog("⬇️ Response data was empty", logType: .endpoint)
