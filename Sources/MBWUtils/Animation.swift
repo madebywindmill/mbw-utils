@@ -110,6 +110,8 @@ public extension UIView {
 
 #endif // extension UIView
 
+// NB: watchOS doesn't have CASpringAnimation or CALayer
+#if os(iOS) || os(macOS)
 public class MBWSpringAnimation: CASpringAnimation {
     var completion: ( () -> Void )?
 }
@@ -207,3 +209,4 @@ extension CALayer: CAAnimationDelegate {
     }
     
 }
+#endif
