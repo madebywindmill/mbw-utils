@@ -215,5 +215,6 @@ extension Foundation.Bundle {
 }
 
 public protocol CoreDataManagerDelegate: AnyObject {
+    /// Optionally perform any necessary manual migrations. 
     func performMigrations(model: NSManagedObjectModel, storeURL: URL)
 }
