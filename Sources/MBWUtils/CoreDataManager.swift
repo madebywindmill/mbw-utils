@@ -69,11 +69,10 @@ public class CoreDataManager {
         let storeURL = documentsURL.appendingPathComponent(dbName)
         Logger.shortLog("Core Data db path: \(storeURL.path)")
         
-        let migrateAutomatically = delegate?.shouldMigrateAutomatically ?? true
         delegate?.performMigrations(model: mom, storeURL: storeURL)
         
         do {
-            let options = [NSMigratePersistentStoresAutomaticallyOption: migrateAutomatically,
+            let options = [NSMigratePersistentStoresAutomaticallyOption: true,
                            NSInferMappingModelAutomaticallyOption: true]
             try psc.addPersistentStore(ofType: NSSQLiteStoreType,
                                        configurationName: nil, at: storeURL, options: options)
@@ -216,6 +215,5 @@ extension Foundation.Bundle {
 }
 
 public protocol CoreDataManagerDelegate: AnyObject {
-    var shouldMigrateAutomatically: Bool { get }
     func performMigrations(model: NSManagedObjectModel, storeURL: URL)
 }
