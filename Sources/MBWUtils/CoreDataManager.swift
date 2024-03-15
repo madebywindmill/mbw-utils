@@ -24,6 +24,7 @@ public class CoreDataManager {
     public static var current: CoreDataManager!
     
     public var mainContext: NSManagedObjectContext!
+    public weak var delegate: CoreDataManagerDelegate?
         
     /// Instantiate a CoreDataManager.
     /// - Parameter modelName: the name of the CoreData model resource file
@@ -33,12 +34,15 @@ public class CoreDataManager {
     ///     * Check the actual name of the Swift package bundle. Sometimes it will be named "MyPackage_MyPackage.bundle" instead of just "MyPackage.bundle" in which case you will want to set `moduleName` to `MyPackage_MyPackage`. You can set a breakpoint and do:
     ///         `po try? FileManager.default.contentsOfDirectory(atPath: Bundle.main.resourcePath!)`
     ///     * For each Core Data entity, be sure to set the class module to the name of the package. It won't be listed in the popup. (You'll never need the underscore version here…)
-    public init(modelName: String, dbName: String, moduleName: String? = nil) {
+    public init(modelName: String, dbName: String, moduleName: String? = nil, delegate: CoreDataManagerDelegate? = nil) {
         let modelURL: URL
         
+        self.delegate = delegate
+        
         if let moduleName = moduleName {
-            guard let tempURL = Bundle.bundleFromModuleWithName(moduleName).url(forResource: modelName,
-                                                                                withExtension: "momd") else {
+            guard let tempURL = Bundle.bundleFromModuleWithName(moduleName).url(
+                forResource: modelName,
+                withExtension: "momd") else {
                 fatalError("Failed to locate DataModel in app bundle")
             }
             modelURL = tempURL
@@ -65,8 +69,11 @@ public class CoreDataManager {
         let storeURL = documentsURL.appendingPathComponent(dbName)
         Logger.shortLog("Core Data db path: \(storeURL.path)")
         
+        let migrateAutomatically = delegate?.shouldMigrateAutomatically ?? true
+        delegate?.performMigrations(model: mom, storeURL: storeURL)
+        
         do {
-            let options = [NSMigratePersistentStoresAutomaticallyOption: true,
+            let options = [NSMigratePersistentStoresAutomaticallyOption: migrateAutomatically,
                            NSInferMappingModelAutomaticallyOption: true]
             try psc.addPersistentStore(ofType: NSSQLiteStoreType,
                                        configurationName: nil, at: storeURL, options: options)
@@ -206,4 +213,9 @@ extension Foundation.Bundle {
         }
         fatalError("unable to find bundle named \(bundleName)")
     }
+}
+
+public protocol CoreDataManagerDelegate: AnyObject {
+    var shouldMigrateAutomatically: Bool { get }
+    func performMigrations(model: NSManagedObjectModel, storeURL: URL)
 }
