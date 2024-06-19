@@ -439,6 +439,17 @@ public extension Optional where Wrapped == String {
     }
 }
 
+public extension Optional {
+    var optionalDesc: String {
+        switch self {
+        case .some(let value):
+            return "\(value)"
+        case .none:
+            return "<nil>"
+        }
+    }
+}
+
 @available(iOS 13, macOS 12.0, watchOS 6, *)
 @available(iOS, deprecated: 15.0, message: "Use the built-in API instead")
 @available(macOS, deprecated: 12.0, message: "Use the built-in API instead")
