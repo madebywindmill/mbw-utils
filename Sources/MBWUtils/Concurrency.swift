@@ -204,3 +204,28 @@ public actor IsolatedCollectionStore {
     }
 
 }
+/// Same as `IsolatedCollectionStore` but suitable for @MainActor contexts.
+@MainActor public class MainActorIsolatedCollectionStore {
+    public var a = [Any]()
+    public var d = [AnyHashable:Any]()
+    
+    public init() {}
+    
+    public func append(_ e: Any) {
+        a.append(e)
+    }
+    
+    public func set(value: Any, key: AnyHashable) {
+        d[key] = value
+    }
+    
+    public subscript(key: AnyHashable) -> Any? {
+        get {
+            return d[key]
+        }
+        set {
+            d[key] = newValue
+        }
+    }
+
+}
