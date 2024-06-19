@@ -193,4 +193,14 @@ public actor IsolatedCollectionStore {
     public func set(value: Any, key: AnyHashable) {
         d[key] = value
     }
+    
+    public subscript(key: AnyHashable) -> Any? {
+        get {
+            return d[key]
+        }
+        set {
+            d[key] = newValue
+        }
+    }
+
 }
