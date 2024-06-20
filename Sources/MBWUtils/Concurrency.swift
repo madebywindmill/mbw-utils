@@ -25,6 +25,16 @@ public func globalAsync(_ block: @escaping (()->())) {
     }
 }
 
+@available(iOS 13, macOS 12.0, watchOS 6, *)
+public func globalAsync(_ block: @escaping (()->())) async {
+    await withCheckedContinuation { continuation in
+        DispatchQueue.global().async {
+            block()
+            continuation.resume()
+        }
+    }
+}
+
 public func globalAsyncAfter(_ interval: TimeInterval, _ block: @escaping (()->())) {
     DispatchQueue.global().asyncAfter(deadline: .now() + interval, execute: block)
 }
