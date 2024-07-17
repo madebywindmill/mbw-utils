@@ -36,3 +36,13 @@ public extension FontDescriptor {
         return self.withSymbolicTraits(symbolicTraits)
     }
 }
+
+public class Platform {
+    public static var majorOSVersion: Int {
+        return ProcessInfo.processInfo.operatingSystemVersion.majorVersion
+    }
+    
+    public static var minorOSVersion: Int {
+        return ProcessInfo.processInfo.operatingSystemVersion.minorVersion
+    }
+}
