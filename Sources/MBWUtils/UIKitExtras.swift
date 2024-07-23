@@ -368,7 +368,7 @@ public extension UIView {
         return views
     }
     
-    /// Given some height, compute the width as determined by autolayout constraints. Useful if the view hasn't been rendered on-screen yet. (NB: this variant has been tested; `autolayoutHeight` has.)
+    /// Given some height, compute the width as determined by autolayout constraints. Useful if the view hasn't been rendered on-screen yet. (NB: this variant hasn't been tested; `autolayoutHeight` has.)
     func autolayoutWidth(for height: CGFloat) -> CGFloat {
         let targetSize = CGSize(
             width: UIView.layoutFittingCompressedSize.width,
