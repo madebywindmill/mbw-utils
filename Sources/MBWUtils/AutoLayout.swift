@@ -45,14 +45,12 @@ public extension View {
         self.heightAnchor.constraint(equalTo: view.heightAnchor, constant: 0).isActive = true
         self.widthAnchor.constraint(equalTo: view.widthAnchor, constant: 0).isActive = true
     }
+    
     func constrainToSuperviewEdges(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) {
         self.autoResizeTranslationCheck()
         self.constrainToEdgesOf(self.superview!, offset: offset, activate: activate, useSafeArea: useSafeArea)
     }
-    func constrainToSuperviewEdges(with insets: EdgeInsets, activate: Bool = true, useSafeArea: Bool = false) {
-        self.autoResizeTranslationCheck()
-        self.constrainToEdgesOf(self.superview!, with: insets, activate: activate, useSafeArea: useSafeArea)
-    }
+
     func constrainToEdgesOf(_ view: View, offset:CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) {
         self.autoResizeTranslationCheck()
         self.leftAnchor.constraint(equalTo: useSafeArea ? view.safeAreaLayoutGuide.leftAnchor : view.leftAnchor, constant: offset).isActive = activate
@@ -60,6 +58,35 @@ public extension View {
         self.bottomAnchor.constraint(equalTo: useSafeArea ? view.safeAreaLayoutGuide.bottomAnchor : view.bottomAnchor, constant: offset * -1).isActive = activate
         self.topAnchor.constraint(equalTo: useSafeArea ? view.safeAreaLayoutGuide.topAnchor : view.topAnchor, constant: offset).isActive = activate
     }
+
+    // MARK: - Constraining with edge insets
+    
+    func constrainToSuperviewEdges(using insets: EdgeInsets, activate: Bool = true, useSafeArea: Bool = false) {
+        self.autoResizeTranslationCheck()
+        self.constrainToEdgesOf(self.superview!, using: insets, activate: activate, useSafeArea: useSafeArea)
+    }
+    
+    func constrainToEdgesOf(_ view: View, using insets: EdgeInsets, activate: Bool = true, useSafeArea: Bool = false) {
+        self.autoResizeTranslationCheck()
+        #if !os(iOS)
+        if useSafeArea {
+            assertionFailure("safeAreaLayoutGuide not supported on macOS")
+            return
+        }
+        #endif
+        self.leftAnchor.constraint(equalTo: useSafeArea ? view.safeAreaLayoutGuide.leftAnchor : view.leftAnchor, constant: insets.left).isActive = true
+        self.rightAnchor.constraint(equalTo: useSafeArea ? view.safeAreaLayoutGuide.rightAnchor : view.rightAnchor, constant: -insets.right).isActive = true
+        self.bottomAnchor.constraint(equalTo: useSafeArea ? view.safeAreaLayoutGuide.bottomAnchor : view.bottomAnchor, constant: -insets.bottom).isActive = true
+        self.topAnchor.constraint(equalTo: useSafeArea ? view.safeAreaLayoutGuide.topAnchor : view.topAnchor, constant: insets.top).isActive = true
+    }
+
+    // While technically correct, these are confusing because the right and bottom insets are reversed from what you'd expect them to be, so now deprecated.
+    @available(*, deprecated, message: "Use constrainToSuperviewEdges(using:) instead.")
+    func constrainToSuperviewEdges(with insets: EdgeInsets, activate: Bool = true, useSafeArea: Bool = false) {
+        self.autoResizeTranslationCheck()
+        self.constrainToEdgesOf(self.superview!, with: insets, activate: activate, useSafeArea: useSafeArea)
+    }
+    @available(*, deprecated, message: "Use constrainToEdgesOf(using:) instead.")
     func constrainToEdgesOf(_ view: View, with insets: EdgeInsets, activate: Bool = true, useSafeArea: Bool = false) {
         self.autoResizeTranslationCheck()
         #if !os(iOS)
@@ -74,6 +101,8 @@ public extension View {
         self.topAnchor.constraint(equalTo: useSafeArea ? view.safeAreaLayoutGuide.topAnchor : view.topAnchor, constant: insets.top).isActive = true
     }
 
+    // MARK: -
+    
     @discardableResult func constrainToSuperviewLeading(offset: CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false, useMargin: Bool = false) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c: NSLayoutConstraint
