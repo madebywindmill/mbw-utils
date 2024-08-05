@@ -12,41 +12,54 @@ import AppKit
 #endif
 
 /// Convenience layer above NSCache. Works with cgImage-based images, but not CoreImage-based images.
-public class MBWImageCache {
+public final class MBWImageCache: @unchecked Sendable {
     private let cache = NSCache<NSString,Image>()
-    
+    private let queue = DispatchQueue(label: "com.madebywindmill.imagecache.queue", attributes: .concurrent)
+
     public init(sizeInMB: Int) {
         cache.name = "MBWImageCache"
         cache.totalCostLimit = sizeInMB * 1024 * 1024
     }
     
     public func removeAll() {
-        cache.removeAllObjects()
+        queue.async(flags: .barrier) { [weak self] in
+            self?.cache.removeAllObjects()
+        }
     }
     
     public func cacheImage(_ image: Image, named name: String) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let self = self else { return }
+            
 #if os(OSX)
-        var rect = NSRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
-        guard let cgImage = image.cgImage(forProposedRect: &rect, context: nil, hints: nil) else {
-            print("MBWImageCache only works with cgImage-based images.")
-            return
-        }
-        cache.setObject(image, forKey: name as NSString, cost: cgImage.bytesPerRow * cgImage.height)
+            var rect = NSRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+            guard let cgImage = image.cgImage(forProposedRect: &rect, context: nil, hints: nil) else {
+                print("MBWImageCache only works with cgImage-based images.")
+                return
+            }
 #else
-        guard let cgImage = image.cgImage else {
-            print("MBWImageCache only works with cgImage-based images.")
-            return
-        }
-        cache.setObject(image, forKey: name as NSString, cost: cgImage.bytesPerRow * cgImage.height)
+            guard let cgImage = image.cgImage else {
+                print("MBWImageCache only works with cgImage-based images.")
+                return
+            }
 #endif
+            
+            cache.setObject(image, forKey: name as NSString, cost: cgImage.bytesPerRow * cgImage.height)
+        }
     }
     
     public func imageNamed(_ name: String) -> Image? {
-        return cache.object(forKey: name as NSString)
+        var result: Image?
+        queue.sync {
+            result = cache.object(forKey: name as NSString)
+        }
+        return result
     }
     
     public func removeImage(named name: String) {
-        cache.removeObject(forKey: name as NSString)
+        queue.async(flags: .barrier) { [weak self] in
+            self?.cache.removeObject(forKey: name as NSString)
+        }
     }
 }
 
