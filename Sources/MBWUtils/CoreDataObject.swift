@@ -50,7 +50,7 @@ open class CoreDataObject: NSManagedObject {
     /// Fetch an object with the given `id` from the store.
     /// - Parameter id: ID of the object to fetch
     /// - Returns: The found object
-    open class func fetch(id: IDType) -> Self? {
+    @MainActor open class func fetch(id: IDType) -> Self? {
         guard let entityName = entity().name else {
             Logger.fileLog("*** Entity name was nil")
             return nil
@@ -76,8 +76,7 @@ open class CoreDataObject: NSManagedObject {
     /// If the object already exists (i.e. there's already an object in the store with the same entity type and `id`), the existing object is updated.
     /// - Parameter saveContext: Whether to save the context after inserting. When updating many objects one after the other, set to false and save the context when finished.
     /// - Returns: A tuple containing the inserted object, whether it was newly created or not (vs updated), and an optional error.
-    @discardableResult open func insertOrUpdate(saveContext: Bool = true) -> (CoreDataObject?, Bool /* wasCreated */, Error?) {
-        assert(Thread.isMainThread)
+    @discardableResult @MainActor open func insertOrUpdate(saveContext: Bool = true) -> (CoreDataObject?, Bool /* wasCreated */, Error?) {
         let managedObject: CoreDataObject
         var wasCreated = false
         if let existing = Self.fetch(id: id) {
@@ -135,8 +134,7 @@ open class CoreDataObject: NSManagedObject {
     /// Delete this object from the store and optionally save the context.
     /// - Parameter saveContext: Whether to save the context after inserting. When updating many objects one after the other, set to false and save the context when finished.
     /// - Returns: An optional error.
-    @discardableResult open func deleteObject(saveContext: Bool = true) -> Error? {
-        assert(Thread.isMainThread)
+    @discardableResult @MainActor open func deleteObject(saveContext: Bool = true) -> Error? {
         CoreDataManager.current.mainContext.delete(self)
         if saveContext {
             if let error = CoreDataManager.current.save() {

@@ -18,7 +18,7 @@ public typealias IDType = String
  
  `CoreDataManager` and `CoreDataObject` work together so all entities managed through `CoreDataManager` should be subclasses of  `CoreDataObject`.
 */
-public class CoreDataManager {
+@MainActor public class CoreDataManager {
     
     // For convenience, assuming there's only ever one in the app
     public static var current: CoreDataManager!
@@ -109,7 +109,6 @@ public class CoreDataManager {
     /// Persist objects in the context
     /// - Returns: An optional error
     @discardableResult public func save() -> Error? {
-        assert(Thread.isMainThread)
         do {
             try mainContext.save()
         } catch {
@@ -119,16 +118,10 @@ public class CoreDataManager {
         return nil
     }
     
-    /// async/await-safe version of the above
+    /// Persist objects in the context
     @available(iOS 13, macOS 12.0, watchOS 6, *)
     open func save() async throws {
-        @MainActor func saveMain() -> Error? {
-            return save()
-        }
-        
-        if let e = await saveMain() {
-            throw e
-        }
+        try mainContext.save()
     }
 
     /// Print all objects in the store to console. **WARNING**: brings entire object graph into memory. For debugging use only.
