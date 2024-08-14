@@ -469,6 +469,16 @@ public extension UIViewController {
             }
         }
     }
+    
+    @available(iOS 13.0, *)
+    func dismiss(animated flag: Bool) async {
+        await withCheckedContinuation { continuation in
+            self.dismiss(animated: flag) {
+                continuation.resume()
+            }
+        }
+    }
+
 }
 
 public extension UIScrollView {
