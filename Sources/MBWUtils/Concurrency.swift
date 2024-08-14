@@ -9,34 +9,33 @@ import Foundation
 
 // MARK: - Utility Functions
 
-public func mainAsync(_ block: @escaping (()->())) {
-    DispatchQueue.main.async {
+
+public func mainAsync(_ block: @escaping @Sendable () -> Void) {
+    Task { @MainActor in
         block()
     }
 }
 
-public func mainAsyncAfter(_ interval: TimeInterval, _ block: @escaping (()->())) {
-    DispatchQueue.main.asyncAfter(deadline: .now() + interval, execute: block)
-}
-
-public func globalAsync(_ block: @escaping (()->())) {
-    DispatchQueue.global().async {
+public func mainAsyncAfter(_ interval: TimeInterval, _ block: @escaping @Sendable () -> Void) {
+    Task { @MainActor in
+        let nanoseconds = UInt64(interval * 1_000_000_000)
+        try await Task.sleep(nanoseconds: nanoseconds)
         block()
     }
 }
 
-@available(iOS 13, macOS 12.0, watchOS 6, *)
-public func globalAsync(_ block: @escaping (()->())) async {
-    await withCheckedContinuation { continuation in
-        DispatchQueue.global().async {
-            block()
-            continuation.resume()
-        }
+public func globalAsync(_ block: @escaping @Sendable () -> Void) {
+    Task.detached {
+        block()
     }
 }
 
-public func globalAsyncAfter(_ interval: TimeInterval, _ block: @escaping (()->())) {
-    DispatchQueue.global().asyncAfter(deadline: .now() + interval, execute: block)
+public func globalAsyncAfter(_ interval: TimeInterval, _ block: @escaping @Sendable () -> Void) {
+    Task.detached {
+        let nanoseconds = UInt64(interval * 1_000_000_000)
+        try await Task.sleep(nanoseconds: nanoseconds)
+        block()
+    }
 }
 
 // MARK: - ParallelAsync
