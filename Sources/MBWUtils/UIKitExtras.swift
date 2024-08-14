@@ -449,6 +449,7 @@ public extension UIViewController {
         window.layer.add(transition, forKey: nil)
         self.present(vc, animated: false, completion: completion)
     }
+    
     func dismiss(customTransition: CATransitionType, duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
         guard let window = self.view.window else {
             Logger.log("*** no window"); completion?(); return
@@ -458,6 +459,15 @@ public extension UIViewController {
         transition.type = customTransition
         window.layer.add(transition, forKey: nil)
         self.dismiss(animated: false, completion: completion)
+    }
+    
+    @available(iOS 13.0, *)
+    func present(_ viewControllerToPresent: UIViewController, animated flag: Bool) async {
+        await withCheckedContinuation { continuation in
+            self.present(viewControllerToPresent, animated: flag) {
+                continuation.resume()
+            }
+        }
     }
 }
 
