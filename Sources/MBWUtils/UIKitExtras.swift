@@ -461,8 +461,9 @@ public extension UIViewController {
         self.dismiss(animated: false, completion: completion)
     }
     
+    // Using the name `present` works but can lead to collisions later if caller wants to call the non-async version in an async context.
     @available(iOS 13.0, *)
-    func present(_ viewControllerToPresent: UIViewController, animated flag: Bool) async {
+    func presentAsync(_ viewControllerToPresent: UIViewController, animated flag: Bool) async {
         await withCheckedContinuation { continuation in
             self.present(viewControllerToPresent, animated: flag) {
                 continuation.resume()
@@ -470,8 +471,9 @@ public extension UIViewController {
         }
     }
     
+    // Using the name `dismiss` works but can lead to collisions later if caller wants to call the non-async version in an async context.
     @available(iOS 13.0, *)
-    func dismiss(animated flag: Bool) async {
+    func dismissAsync(animated flag: Bool) async {
         await withCheckedContinuation { continuation in
             self.dismiss(animated: flag) {
                 continuation.resume()
