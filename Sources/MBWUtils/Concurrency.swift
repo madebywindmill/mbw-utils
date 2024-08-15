@@ -181,14 +181,70 @@ public extension Sequence {
     }
 }
 
-/// This is handy for creating concurrency-safe local arrays and dictionaries, for which it can be used to store either or both.
-/// Ex:
-///   let store = CollectionStore()
-///   await store.append("hello")
-///   await store.set(value: "value", key: "key")
-///   let localArray = await store.a
-///   let localDictionary = await store.d
+/// This is handy for creating concurrency-safe local arrays and dictionaries, for which it can be used to store either or both. Replaces deprecated `IsolatedCollectionStore` and `MainActorIsolatedCollectionStore`.
+public class LockingCollectionStore: @unchecked Sendable  {
+    private let lock = NSLock()
+
+    private var _a: [Any] = []
+    private var _d: [AnyHashable: Any] = [:]
+
+    public var a: [Any] {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return _a
+        }
+        set {
+            lock.lock()
+            defer { lock.unlock() }
+            _a = newValue
+        }
+    }
+
+    public var d: [AnyHashable: Any] {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return _d
+        }
+        set {
+            lock.lock()
+            defer { lock.unlock() }
+            _d = newValue
+        }
+    }
+
+    public init() {}
+    
+    public func append(_ e: Any) {
+        lock.lock()
+        defer { lock.unlock() }
+        _a.append(e)
+    }
+
+    public func set(value: Any, key: AnyHashable) {
+        lock.lock()
+        defer { lock.unlock() }
+        _d[key] = value
+    }
+
+    public subscript(key: AnyHashable) -> Any? {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return _d[key]
+        }
+        set {
+            lock.lock()
+            defer { lock.unlock() }
+            _d[key] = newValue
+        }
+    }
+}
+
+/// Doesn't work well with Swift 6, so deprecated in favor of `LockingCollectionStore`.
 @available(iOS 13, macOS 12.0, watchOS 6, *)
+@available(*, deprecated, message: "Use LockingCollectionStore instead.")
 public actor IsolatedCollectionStore {
     public var a = [Any]()
     public var d = [AnyHashable:Any]()
@@ -213,7 +269,9 @@ public actor IsolatedCollectionStore {
     }
 
 }
-/// Same as `IsolatedCollectionStore` but suitable for @MainActor contexts.
+
+/// Doesn't work well with Swift 6, so deprecated in favor of `LockingCollectionStore`.
+@available(*, deprecated, message: "Use LockingCollectionStore instead.")
 @MainActor public class MainActorIsolatedCollectionStore {
     public var a = [Any]()
     public var d = [AnyHashable:Any]()
