@@ -61,7 +61,6 @@ public typealias IDType = String
         
         mainContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         mainContext?.persistentStoreCoordinator = psc
-        mainContext?.mergePolicy = NSOverwriteMergePolicy // prevents merge errors
         
         guard let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             fatalError("Failed to resolve documents directory")
