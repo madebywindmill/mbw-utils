@@ -10,13 +10,13 @@ import Foundation
 // MARK: - Utility Functions
 
 
-public func mainAsync(_ block: @escaping @Sendable () -> Void) {
+public func mainAsync(_ block: @escaping @Sendable @MainActor () -> Void) {
     Task { @MainActor in
         block()
     }
 }
 
-public func mainAsyncAfter(_ interval: TimeInterval, _ block: @escaping @Sendable () -> Void) {
+public func mainAsyncAfter(_ interval: TimeInterval, _ block: @escaping @Sendable @MainActor () -> Void) {
     Task { @MainActor in
         let nanoseconds = UInt64(interval * 1_000_000_000)
         try await Task.sleep(nanoseconds: nanoseconds)
