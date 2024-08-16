@@ -45,61 +45,44 @@ public func globalAsyncAfter(_ interval: TimeInterval, _ block: @escaping @Senda
   * Its executeAndWait executes synchronously, which allows for local object retainment.
   * The completion always executes on the main thread.
   * It has a more concise syntax.
-
- ParallelAsync can work with a provided `OperationQueue` (which is handy if you want to set a concurrency limit), otherwise it uses `DispatchGroup`.
 */
-public class ParallelAsync {
+public final class ParallelAsync: @unchecked Sendable {
+    private var blocks = [@Sendable () async -> Void]()
     
-    private var parallelQ = DispatchQueue(label: "ParallelAsyncParallelQ", attributes: .concurrent)
-    private var blocks = [(()->Void)]()
-    private var opq: OperationQueue?
-    
-    /// Instantiate a ParallelAsync object. The provided `opq` will be used if provided, otherwise a DispatchGroup is used.
-    public init(opq: OperationQueue? = nil) {
-        self.opq = opq
-    }
-    
-    public func add(_ block: @escaping (()->Void)) {
+    public init() {}
+
+    /// Add an async block of work to be executed in parallel.
+    public func add(_ block: @escaping @Sendable () async -> Void) {
         blocks.append(block)
     }
     
-    /// Execute all blocks, wait for their completion, and fire the completion block on the main thread when done.
+    /// Execute all blocks concurrently, wait for their completion, and fire the completion block on the main thread when done.
     /// Since this is a synchronous function, do not call on the main thread from a UIKit/AppKit/SwiftUI app.
-    public func executeAndWait(completion: @escaping (()->Void)) {
-        if let opq = opq {
-            _executeAndWaitWithOpQ(opq, completion: completion)
-        } else {
-            let group = DispatchGroup()
-            _executeAndWaitWithGroup(group, completion: completion)
-        }
-    }
-    
-    private func _executeAndWaitWithGroup(_ group: DispatchGroup, completion: @escaping (()->Void)) {
-        for nextBlock in blocks {
-            group.enter()
-            parallelQ.async {
-                nextBlock()
-                group.leave()
+    public func executeAndWait(completion: @escaping @Sendable () -> Void) {
+        let localBlocks = blocks
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            Task {
+                await withTaskGroup(of: Void.self) { taskGroup in
+                    for block in localBlocks {
+                        taskGroup.addTask {
+                            await block()
+                        }
+                    }
+                }
+
+                semaphore.signal()
+
+                await MainActor.run {
+                    completion()
+                }
             }
         }
-        group.wait()
         
-        DispatchQueue.main.async {
-            completion()
-        }
+        semaphore.wait()
     }
-    
-    private func _executeAndWaitWithOpQ(_ opq: OperationQueue, completion: @escaping (()->Void)) {
-        for nextBlock in blocks {
-            opq.addOperation(nextBlock)
-        }
-        opq.waitUntilAllOperationsAreFinished()
-        
-        DispatchQueue.main.async {
-            completion()
-        }
-    }
-
 }
 
 public extension DispatchQueue {
