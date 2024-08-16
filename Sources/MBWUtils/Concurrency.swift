@@ -135,8 +135,8 @@ public class UnfairLock {
 }
 
 @available(iOS 13, macOS 12.0, watchOS 6, *)
-public extension Sequence {
-    func parallelForEach(_ block: @escaping @Sendable (Element) async throws -> ()) async rethrows {
+public extension Sequence where Element: Sendable {
+    func parallelForEach(_ block: @escaping @Sendable (Element) async throws -> Void) async rethrows {
         try await withThrowingTaskGroup(of: Void.self) { group in
             for element in self {
                 group.addTask {
@@ -148,7 +148,7 @@ public extension Sequence {
         }
     }
     
-    func parallelForEach(maxTaskCnt: Int, _ block: @escaping @Sendable (Element) async throws -> ()) async rethrows {
+    func parallelForEach(maxTaskCnt: Int, _ block: @escaping @Sendable (Element) async throws -> Void) async rethrows {
         try await withThrowingTaskGroup(of: Void.self) { group in
             for (idx, element) in self.enumerated() {
                 if idx >= maxTaskCnt {
