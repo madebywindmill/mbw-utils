@@ -7,16 +7,16 @@
 
 #if os(iOS)
 import UIKit
-public typealias View = UIView
+public typealias CocoaView = UIView
 public typealias EdgeInsets = UIEdgeInsets
 #elseif os(OSX)
 import AppKit
-public typealias View = NSView
+public typealias CocoaView = NSView
 public typealias EdgeInsets = NSEdgeInsets
 #endif
 
 #if os(iOS) || os(OSX)
-public extension View {
+public extension CocoaView {
     
     // Auto layout convenience:
     func autoResizeTranslationCheck() {
@@ -40,7 +40,7 @@ public extension View {
         c.isActive = activate
         return c
     }
-    func constrainSizeTo(view: View) {
+    func constrainSizeTo(view: CocoaView) {
         self.autoResizeTranslationCheck()
         self.heightAnchor.constraint(equalTo: view.heightAnchor, constant: 0).isActive = true
         self.widthAnchor.constraint(equalTo: view.widthAnchor, constant: 0).isActive = true
@@ -51,7 +51,7 @@ public extension View {
         self.constrainToEdgesOf(self.superview!, offset: offset, activate: activate, useSafeArea: useSafeArea)
     }
 
-    func constrainToEdgesOf(_ view: View, offset:CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) {
+    func constrainToEdgesOf(_ view: CocoaView, offset:CGFloat = 0, activate: Bool = true, useSafeArea: Bool = false) {
         self.autoResizeTranslationCheck()
         self.leftAnchor.constraint(equalTo: useSafeArea ? view.safeAreaLayoutGuide.leftAnchor : view.leftAnchor, constant: offset).isActive = activate
         self.rightAnchor.constraint(equalTo: useSafeArea ? view.safeAreaLayoutGuide.rightAnchor : view.rightAnchor, constant: offset * -1).isActive = activate
@@ -66,7 +66,7 @@ public extension View {
         self.constrainToEdgesOf(self.superview!, using: insets, activate: activate, useSafeArea: useSafeArea)
     }
     
-    func constrainToEdgesOf(_ view: View, using insets: EdgeInsets, activate: Bool = true, useSafeArea: Bool = false) {
+    func constrainToEdgesOf(_ view: CocoaView, using insets: EdgeInsets, activate: Bool = true, useSafeArea: Bool = false) {
         self.autoResizeTranslationCheck()
         #if !os(iOS)
         if useSafeArea {
@@ -87,7 +87,7 @@ public extension View {
         self.constrainToEdgesOf(self.superview!, with: insets, activate: activate, useSafeArea: useSafeArea)
     }
     @available(*, deprecated, message: "Use constrainToEdgesOf(using:) instead.")
-    func constrainToEdgesOf(_ view: View, with insets: EdgeInsets, activate: Bool = true, useSafeArea: Bool = false) {
+    func constrainToEdgesOf(_ view: CocoaView, with insets: EdgeInsets, activate: Bool = true, useSafeArea: Bool = false) {
         self.autoResizeTranslationCheck()
         #if !os(iOS)
         if useSafeArea {
@@ -249,56 +249,56 @@ public extension View {
         c.isActive = true
         return c
     }
-    @discardableResult func constrainToXCenterOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainToXCenterOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = self.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainToYCenterOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainToYCenterOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = self.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainToTopOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainToTopOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.topAnchor.constraint(equalTo: self.bottomAnchor, constant: offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainTopToTopOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainTopToTopOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.topAnchor.constraint(equalTo: self.topAnchor, constant: offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainTopToBottomOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainTopToBottomOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         // NB: offset is negated to be more intuitive
         self.autoResizeTranslationCheck()
         let c = view.bottomAnchor.constraint(equalTo: self.topAnchor, constant: -offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainBottomToBottomOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainBottomToBottomOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainBottomToTopOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainBottomToTopOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.topAnchor.constraint(equalTo: self.bottomAnchor, constant: offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainToLeadingOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainToLeadingOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.leadingAnchor.constraint(equalTo: self.trailingAnchor, constant: -offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainLeadingToLeadingOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainLeadingToLeadingOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: -offset)
         if activate {
@@ -306,55 +306,55 @@ public extension View {
         }
         return c
     }
-    @discardableResult func constrainLeadingToTrailingOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainLeadingToTrailingOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.trailingAnchor.constraint(equalTo: self.leadingAnchor, constant: -offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainLeftToRightOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainLeftToRightOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.rightAnchor.constraint(equalTo: self.leftAnchor, constant: -offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainTrailingToLeadingOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainTrailingToLeadingOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.leadingAnchor.constraint(equalTo: self.trailingAnchor, constant: offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainToTrailingOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainToTrailingOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.trailingAnchor.constraint(equalTo: self.leadingAnchor, constant: -offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainTrailingToTrailingOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainTrailingToTrailingOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainWidthEqualTo(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainWidthEqualTo(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.widthAnchor.constraint(equalTo: self.widthAnchor, constant: offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func constrainHeightEqualTo(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func constrainHeightEqualTo(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.heightAnchor.constraint(equalTo: self.heightAnchor, constant: offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func alignBottomToBottomOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func alignBottomToBottomOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: offset)
         c.isActive = activate
         return c
     }
-    @discardableResult func alignBottomToTopOf(_ view: View, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
+    @discardableResult func alignBottomToTopOf(_ view: CocoaView, offset: CGFloat = 0, activate: Bool = true) -> NSLayoutConstraint {
         self.autoResizeTranslationCheck()
         let c = view.topAnchor.constraint(equalTo: self.bottomAnchor, constant: offset)
         c.isActive = activate
