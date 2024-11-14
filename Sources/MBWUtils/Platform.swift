@@ -7,20 +7,20 @@
 
 #if os(iOS)  || os(watchOS)
 import UIKit
-public typealias Font = UIFont
-public typealias Image = UIImage
-public typealias Color = UIColor
+public typealias CocoaFont = UIFont
+public typealias CocoaImage = UIImage
+public typealias CocoaColor = UIColor
 public typealias FontDescriptor = UIFontDescriptor
 #elseif os(OSX)
 import AppKit
-public typealias Font = NSFont
-public typealias Image = NSImage
-public typealias Color = NSColor
+public typealias CocoaFont = NSFont
+public typealias CocoaImage = NSImage
+public typealias CocoaColor = NSColor
 public typealias FontDescriptor = NSFontDescriptor
 #endif
 
-// On macOS Font.familyName is an optional but on iOS it's not. Conform to iOS.
-public extension Font {
+// On macOS CocoaFont.familyName is an optional but on iOS it's not. Conform to iOS.
+public extension CocoaFont {
     var platformFriendlyFamilyName: String {
         #if os(iOS) || os(watchOS)
         return self.familyName
