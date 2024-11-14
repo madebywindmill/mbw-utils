@@ -13,7 +13,7 @@ import AppKit
 
 /// Convenience layer above NSCache. Works with cgImage-based images, but not CoreImage-based images.
 public final class MBWImageCache: @unchecked Sendable {
-    private let cache = NSCache<NSString,Image>()
+    private let cache = NSCache<NSString,CocoaImage>()
     private let queue = DispatchQueue(label: "com.madebywindmill.imagecache.queue", attributes: .concurrent)
 
     public init(sizeInMB: Int) {
@@ -27,7 +27,7 @@ public final class MBWImageCache: @unchecked Sendable {
         }
     }
     
-    public func cacheImage(_ image: Image, named name: String) {
+    public func cacheImage(_ image: CocoaImage, named name: String) {
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self else { return }
             
@@ -48,8 +48,8 @@ public final class MBWImageCache: @unchecked Sendable {
         }
     }
     
-    public func imageNamed(_ name: String) -> Image? {
-        var result: Image?
+    public func imageNamed(_ name: String) -> CocoaImage? {
+        var result: CocoaImage?
         queue.sync {
             result = cache.object(forKey: name as NSString)
         }

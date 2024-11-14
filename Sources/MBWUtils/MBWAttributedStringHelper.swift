@@ -21,9 +21,9 @@ public class MBWAttributedStringHelper {
     
     public init() {}
 
-    public var normAttrs: [NSAttributedString.Key : Any] = [NSAttributedString.Key.font : Font.systemFont(ofSize: 15.0, weight: .regular)]
-    public var boldAttrs: [NSAttributedString.Key : Any] = [NSAttributedString.Key.font : Font.systemFont(ofSize: 15.0, weight: .bold)]
-    public var lightAttrs: [NSAttributedString.Key : Any] = [NSAttributedString.Key.font : Font.systemFont(ofSize: 15.0, weight: .light)]
+    public var normAttrs: [NSAttributedString.Key : Any] = [NSAttributedString.Key.font : CocoaFont.systemFont(ofSize: 15.0, weight: .regular)]
+    public var boldAttrs: [NSAttributedString.Key : Any] = [NSAttributedString.Key.font : CocoaFont.systemFont(ofSize: 15.0, weight: .bold)]
+    public var lightAttrs: [NSAttributedString.Key : Any] = [NSAttributedString.Key.font : CocoaFont.systemFont(ofSize: 15.0, weight: .light)]
     public var other1Attrs: [NSAttributedString.Key : Any] = [:]
     public var other2Attrs: [NSAttributedString.Key : Any] = [:]
     public var other3Attrs: [NSAttributedString.Key : Any] = [:]
@@ -57,19 +57,19 @@ public extension String {
     }
     
     var light: NSAttributedString {
-        return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : Font.systemFont(ofSize: 17.0, weight: .light)])
+        return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : CocoaFont.systemFont(ofSize: 17.0, weight: .light)])
     }
     
     var regular: NSAttributedString {
-        return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : Font.systemFont(ofSize: 17.0, weight: .regular)])
+        return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : CocoaFont.systemFont(ofSize: 17.0, weight: .regular)])
     }
     
     var semibold: NSAttributedString {
-        return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : Font.systemFont(ofSize: 17.0, weight: .semibold)])
+        return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : CocoaFont.systemFont(ofSize: 17.0, weight: .semibold)])
     }
     
     var bold: NSAttributedString {
-        return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : Font.systemFont(ofSize: 17.0, weight: .bold)])
+        return NSAttributedString(string: self, attributes: [NSAttributedString.Key.font : CocoaFont.systemFont(ofSize: 17.0, weight: .bold)])
     }
 }
 
@@ -107,7 +107,7 @@ public extension NSAttributedString {
         return mutableString
     }
     
-    func font(_ font: Font, color: Color? = nil) -> NSAttributedString {
+    func font(_ font: CocoaFont, color: CocoaColor? = nil) -> NSAttributedString {
         let mutableString = NSMutableAttributedString(attributedString: self)
         mutableString.addAttribute(.font, value: font, range: NSRange(location: 0, length: mutableString.length))
         if let color = color {
@@ -116,7 +116,7 @@ public extension NSAttributedString {
         return mutableString
     }
         
-    func fontFace(_ font: Font, color: Color? = nil) -> NSAttributedString {
+    func fontFace(_ font: CocoaFont, color: CocoaColor? = nil) -> NSAttributedString {
         let mutableString = NSMutableAttributedString(attributedString: self)
         mutableString.setFontFace(font: font, color: color)
         return mutableString
@@ -126,7 +126,7 @@ public extension NSAttributedString {
 
 public extension NSMutableAttributedString {
     
-    func setFontFace(font: Font, color: Color? = nil) {
+    func setFontFace(font: CocoaFont, color: CocoaColor? = nil) {
         // TODO: fix Apple bug where SF rounded isn't getting the correct weight
         beginEditing()
         self.enumerateAttribute(
@@ -134,7 +134,7 @@ public extension NSMutableAttributedString {
             in: NSRange(location: 0, length: self.length)
         ) { (value, range, stop) in
 
-            if let f = value as? Font,
+            if let f = value as? CocoaFont,
               var newFontDescriptor = f.fontDescriptor
                 .withFamily(font.platformFriendlyFamilyName)
                 .platformFriendlyWithSymbolicTraits(f.fontDescriptor.symbolicTraits)
@@ -147,7 +147,7 @@ public extension NSMutableAttributedString {
                 }
                 
                 
-                let newFont = Font(
+                let newFont = CocoaFont(
                     descriptor: newFontDescriptor,
                     size: font.pointSize
                 )
