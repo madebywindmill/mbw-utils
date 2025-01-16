@@ -40,6 +40,14 @@ public extension String {
         return "\u{fffc}"
     }
 
+    static func fromUnichar(_ c: unichar) -> String {
+        if let char = Character.fromUnichar(c) {
+            return String(char)
+        } else {
+            return ""
+        }
+    }
+
     /// Can be used for shorter UUIDs.
     static func random(length: Int) -> String {
         let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -776,5 +784,14 @@ public extension NSAttributedString {
         }
         
         return attributeDictionary
+    }
+}
+
+public extension Character {
+    static func fromUnichar(_ c: unichar) -> Character? {
+        guard let scalar = UnicodeScalar(c) else {
+            return nil
+        }
+        return Character(scalar)
     }
 }
