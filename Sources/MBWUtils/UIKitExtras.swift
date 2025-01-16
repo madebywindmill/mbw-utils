@@ -823,6 +823,7 @@ public extension UIImage {
             assertionFailure()
         }
         
+        // TODO: fix calls to translatedBy, scaledBy and test.
         switch imageOrientation {
         case .upMirrored, .downMirrored:
             transform.translatedBy(x: size.width, y: 0)

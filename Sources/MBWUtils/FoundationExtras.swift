@@ -191,6 +191,59 @@ public extension Data {
         return jsonData
     }
     
+    static func cachedDataFrom(url: URL, authorizationHeader: [String:String]? = nil) -> Data? {
+        var request = URLRequest(url: url, cachePolicy: .returnCacheDataDontLoad, timeoutInterval: 10.0)
+        if let authorizationHeader {
+            for key in authorizationHeader.keys {
+                request.setValue(authorizationHeader[key], forHTTPHeaderField: key)
+            }
+        }
+        if let data = URLCache.shared.cachedResponse(for: request)?.data {
+            return data
+        } else {
+            return nil
+        }
+    }
+    
+    @available(iOS 13, macOS 12.0, watchOS 6, *)
+    static func from(url: URL, returnCachedDataIfAvailable: Bool = true, authorizationHeader: [String:String]? = nil, cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) async throws -> Data {
+        if returnCachedDataIfAvailable, let data = Data.cachedDataFrom(url: url, authorizationHeader: authorizationHeader) {
+            return data
+        } else {
+            var request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 10.0)
+            if let authorizationHeader {
+                for key in authorizationHeader.keys {
+                    request.setValue(authorizationHeader[key], forHTTPHeaderField: key)
+                }
+            }
+            let (data, urlResponse) = try await URLSession.shared.data(for: request)
+            if let urlResponse = urlResponse as? HTTPURLResponse, urlResponse.statusCode == 403 {
+                throw NSError(domain: NSURLErrorDomain, code: NSURLErrorUserAuthenticationRequired)
+            }
+            return data
+        }
+    }
+
+    var imageFileExtension: String {
+        var values = [UInt8](repeating:0, count:1)
+        self.copyBytes(to: &values, count: 1)
+
+        let ext: String
+        switch (values[0]) {
+        case 0xFF:
+            ext = ".jpg"
+        case 0x89:
+            ext = ".png"
+        case 0x47:
+            ext = ".gif"
+        case 0x49, 0x4D :
+            ext = ".tiff"
+        default:
+            ext = ".png"
+        }
+        return ext
+    }
+
     func jsonToDict() -> Dictionary<String,AnyObject>? {
         var jsonDict: Dictionary<String,AnyObject>?
         do {
@@ -218,7 +271,8 @@ public extension Data {
     func hexadecimal() -> String {
         let hexBytes = self.map { String(format: "%02hhx", $0) }
         return hexBytes.joined()
-    }    
+    }
+    
 }
 
 public extension NSData {
@@ -237,6 +291,10 @@ public extension NSData {
 
 public extension String {
     
+    static var attachmentCharacter: String {
+        return "\u{fffc}"
+    }
+
     /// Can be used for shorter UUIDs.
     static func random(length: Int) -> String {
         let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -574,3 +632,17 @@ public func addressString(of obj: AnyObject) -> String {
     return "\(Unmanaged.passUnretained(obj).toOpaque())"
 }
 
+public extension CGRect {
+    func isAdjacentTo(_ r2: CGRect) -> Bool {
+        if self.intersects(r2) {
+            return true
+        }
+
+        let deltaY = abs(r2.origin.y - self.maxY)
+        if deltaY <= 0.001 {
+            return true
+        }
+
+        return false
+    }
+}

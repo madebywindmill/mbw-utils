@@ -9,6 +9,219 @@
 
 import AppKit
 
+public extension NSWindow {
+    /// Hides the effect background view in the toolbar behind the Inspector area, without any SPI!
+    func inspectorToolbarBackgroundView() -> NSVisualEffectView? {
+        guard let titlebarContainer = contentView?.superview?.subviews.first(where: { view in
+            String(describing: view).contains("NSTitlebarContainerView")
+        }) else { return nil }
+        guard let titlebarView = titlebarContainer.subviews.first(where: { view in
+            String(describing: view).contains("NSTitlebarView")
+        }) else { return nil }
+        let effectViews = titlebarView.subviews.compactMap({ view in
+            view is NSVisualEffectView ? view : nil
+        })
+        
+        for effectView in effectViews {
+            if effectView.frame.origin.x > 0 {
+                return effectView as? NSVisualEffectView
+            }
+        }
+        return nil
+    }
+}
+
+public extension NSView {
+    /// Sets `newClipsToBounds` on all `subviews`, including _their_ subviews.
+    func setClipsToBoundsForAllSubviews(_ newClipsToBounds: Bool) {
+        for view in subviews {
+            view.clipsToBounds = newClipsToBounds
+            view.setClipsToBoundsForAllSubviews(newClipsToBounds)
+        }
+    }
+    
+    func bringSubviewToFront(_ view: NSView) {
+        let context = Unmanaged.passUnretained(view).toOpaque()
+        
+        self.sortSubviews({ (viewA, viewB, context) -> ComparisonResult in
+            let theView = Unmanaged<NSView>.fromOpaque(context!).takeUnretainedValue()
+            
+            if viewA == theView {
+                return .orderedDescending
+            } else if viewB == theView {
+                return .orderedAscending
+            } else {
+                return .orderedSame
+            }
+        }, context: context)
+    }
+
+    var isFirstResponder: Bool {
+        return self.window?.firstResponder == self
+    }
+
+    var viewBackgroundColor: NSColor? {
+        get {
+            if let cgcolor = layer?.backgroundColor {
+                return NSColor(cgColor: cgcolor)
+            } else {
+                return nil
+            }
+        }
+        set {
+            self.wantsLayer = true
+            self.layer?.backgroundColor = newValue?.cgColor
+        }
+    }
+}
+
+public extension NSTextView {
+    func rectFor(range: NSRange) -> NSRect? {
+        if usesTextKit2() {
+            return nil
+        } else {
+            guard let layoutManager = layoutManager, let textContainer = textContainer else {
+                return nil
+            }
+            
+            let range = layoutManager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+            var rect = layoutManager.boundingRect(forGlyphRange: range, in: textContainer)
+            rect = rect.offsetBy(dx: textContainerOrigin.x, dy: textContainerOrigin.y)
+            return rect
+        }
+    }
+    
+    var rectForActiveRange: NSRect {
+        if usesTextKit2() {
+            return .zero
+        } else {
+            guard let layoutManager = layoutManager, let textContainer = textContainer else {
+                return NSRect()
+            }
+            
+            let range = layoutManager.glyphRange(forCharacterRange: selectedRange(), actualCharacterRange: nil)
+            var rect = layoutManager.boundingRect(forGlyphRange: range, in: textContainer)
+            rect = rect.offsetBy(dx: textContainerOrigin.x, dy: textContainerOrigin.y)
+            return rect
+        }
+    }
+    
+    /// Returns the range of the current word based on where the text cursor is.
+    var rangeForCurrentWord: NSRange? {
+        let string = NSMutableString(string: string)
+        if selectedRange().length > 0 {
+            return selectedRange()
+        } else {
+            let insertionPoint = selectedRange().location
+            
+            // Look before and after for "new word" separators (aka, spaces and attachment characters).
+            var startOfWordIndex: Int?
+            var endOfWordIndex: Int?
+            
+            var searchIndex = insertionPoint
+            let characterSetToLookFor = CharacterSet(charactersIn: " \r\n\(String.attachmentCharacter)")
+            
+            // Search forward for end of word if not at the end already
+            if insertionPoint != string.length {
+                while searchIndex < string.length {
+                    let substring = string.substring(with: NSRange(location: searchIndex, length: 1)) as NSString
+                    if substring.rangeOfCharacter(from: characterSetToLookFor).location != NSNotFound {
+                        endOfWordIndex = searchIndex
+                        break
+                    }
+                    searchIndex += 1
+                }
+            } else {
+                endOfWordIndex = insertionPoint
+            }
+
+            // Search backward for start of word
+            searchIndex = insertionPoint - 1
+            while searchIndex >= 0 {
+                let substring = string.substring(with: NSRange(location: searchIndex, length: 1)) as NSString
+                if substring.rangeOfCharacter(from: characterSetToLookFor).location != NSNotFound {
+                    startOfWordIndex = searchIndex + 1
+                    break
+                }
+                if nil == startOfWordIndex && searchIndex == 0 {
+                    startOfWordIndex = 0
+                }
+                searchIndex -= 1
+            }
+            
+            if let startOfWordIndex, let endOfWordIndex, endOfWordIndex >= startOfWordIndex {
+                return NSRange(location: startOfWordIndex, length: endOfWordIndex - startOfWordIndex)
+            } else {
+                return selectedRange()
+            }
+        }
+    }
+    
+    var rectForCurrentWord: NSRect? {
+        guard let rangeForCurrentWord else { return nil }
+        return rectFor(range: rangeForCurrentWord)
+    }
+    
+    func usesTextKit2() -> Bool {
+        if #available(macOS 12, *) {
+            return textLayoutManager != nil
+        } else {
+            return false
+        }
+    }
+    
+    func textHeight() -> CGFloat? {
+        return intrinsicContentSize.height
+    }
+    
+}
+
+public extension NSTableView {
+    func rowIsVisible(_ row: Int) -> Bool {
+        let visibleRowsRange = rows(in: visibleRect)
+        return visibleRowsRange.contains(row)
+    }
+    
+    func visibleCells() -> [NSTableCellView] {
+        var visibleCells: [NSTableCellView] = []
+        let visibleRowRange = rows(in: self.visibleRect)
+        for rowIndex in visibleRowRange.location..<visibleRowRange.upperBound {
+            if let rowView = rowView(atRow: rowIndex, makeIfNecessary: false) {
+                for subview in rowView.subviews {
+                    if let cellView = subview as? NSTableCellView {
+                        visibleCells.append(cellView)
+                    }
+                }
+            }
+        }
+        return visibleCells
+    }
+}
+
+public extension NSMenu {
+    func item(withIdentifier identifier: String) -> NSMenuItem? {
+        return items.first { item in
+            item.identifier?.rawValue == identifier
+        }
+    }
+}
+
+public extension NSAlert {
+    static func presentSimpleAlertOn(_ window: NSWindow?, title: String, message: String? = nil, completion: (()->Void)? = nil) {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message ?? ""
+        alert.addButton(withTitle: "OK")
+        if let window {
+            alert.beginSheetModal(for: window) { (response) in
+                completion?()
+            }
+        } else {
+            alert.runModal()
+        }
+    }
+}
+
 public extension NSColor {
     var hex3String: String {
         guard let colorSpace = self.cgColor.colorSpace else {
@@ -152,6 +365,52 @@ public extension NSColor {
 
 public extension NSImage {
     
+    class func downloadImageToFile(from url: URL, authorizationHeader: [String:String]? = nil) async throws -> URL {
+        let imageData = try await Data.from(url: url, authorizationHeader: authorizationHeader)
+        
+        if let cacheDirectory = try? FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true) as URL? {
+            let filename = NSUUID().uuidString + imageData.imageFileExtension
+            let saveToURL = cacheDirectory.appendingPathComponent(filename)
+            try imageData.write(to: saveToURL)
+            return saveToURL
+        } else {
+            throw NSError(domain: NSCocoaErrorDomain, code: NSFileWriteNoPermissionError)
+        }
+    }
+    
+    class func removeCachedImageFrom(url: URL) {
+        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 10.0)
+        URLCache.shared.removeCachedResponse(for: request)
+    }
+    
+    class func cachedImageFrom(url: URL, authorizationHeader: [String:String]? = nil) -> NSImage? {
+        if let data = Data.cachedDataFrom(url: url, authorizationHeader: authorizationHeader), let image = NSImage(data: data) {
+            return image
+        } else {
+            return nil
+        }
+    }
+    
+    class func image(from url: URL, authorizationHeader: [String:String]? = nil, cachePolicy: NSURLRequest.CachePolicy) async throws -> NSImage? {
+        if let cachedImage = cachedImageFrom(url: url, authorizationHeader: authorizationHeader) {
+            return cachedImage
+        } else {
+            let imageData = try await Data.from(url: url, returnCachedDataIfAvailable: false, authorizationHeader: authorizationHeader, cachePolicy: cachePolicy)
+            guard let image = NSImage(data: imageData) else {
+                throw NSError(domain: "ImageError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to create image from data"])
+            }
+            return image
+        }
+    }
+
+    var sizeInBytes: Int {
+        guard let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            assertionFailure()
+            return 0
+        }
+        return cgImage.bytesPerRow * cgImage.height
+    }
+
     func jpegData(compressionQuality: CGFloat) -> Data? {
         let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil)!
         let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
@@ -199,15 +458,6 @@ public extension NSImage {
         newImage.unlockFocus()
         return newImage
     }
-    
-    var sizeInBytes: Int {
-        guard let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-            assertionFailure()
-            return 0
-        }
-        return cgImage.bytesPerRow * cgImage.height
-    }
-
 }
 
 
