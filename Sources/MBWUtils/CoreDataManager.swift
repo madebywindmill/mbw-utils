@@ -8,6 +8,10 @@ import CoreData
 
 public typealias IDType = String
 
+public extension IDType {
+    static var multipleIDs = "<<multiple>>"
+}
+
 /** A convenience class that manages Core Data stores.
  
  `CoreDataManager` makes some assumptions about how the CD store is managed:

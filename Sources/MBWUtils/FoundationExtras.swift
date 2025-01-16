@@ -36,6 +36,30 @@ public extension Date {
         return formatter.date(from: str)
     }
     
+    var year: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy"
+        return dateFormatter.string(from: Date())
+    }
+
+    var startOfDay: Date {
+        return Calendar.current.startOfDay(for: self)
+    }
+    
+    var endOfDay: Date {
+        var components = DateComponents()
+        components.day = 1
+        components.second = -1
+        return Calendar.current.date(byAdding: components, to: startOfDay)!
+    }
+    
+    var tomorrowMidnight: Date {
+        var components = DateComponents()
+        components.day = 1
+        components.second = 0
+        return Calendar.current.date(byAdding: components, to: startOfDay)!
+    }
+
     func ISO8601String() -> String {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
@@ -62,25 +86,7 @@ public extension Date {
     func isBeforeDate(_ date: Date) -> Bool {
         return self.compare(date) == .orderedAscending
     }
-    
-    var startOfDay: Date {
-        return Calendar.current.startOfDay(for: self)
-    }
-    
-    var endOfDay: Date {
-        var components = DateComponents()
-        components.day = 1
-        components.second = -1
-        return Calendar.current.date(byAdding: components, to: startOfDay)!
-    }
-    
-    var tomorrowMidnight: Date {
-        var components = DateComponents()
-        components.day = 1
-        components.second = 0
-        return Calendar.current.date(byAdding: components, to: startOfDay)!
-    }
-    
+        
     func isAM() -> Bool {
         let hour = Calendar.current.component(.hour, from: self)
         return hour < 12
@@ -106,6 +112,48 @@ public extension Date {
     func localDesc() -> String {
         return self.description(with: .current)
     }
+    
+    @available(iOS 15, macOS 12.0, watchOS 6, *)
+    func friendlyTimeString(includeTime: Bool = true) -> String {
+        if Calendar.current.isDateInToday(self) {
+            return "Today\(includeTime ? (" at " + formatted(date: .omitted, time: .shortened)) : "")"
+        } else if Calendar.current.isDateInYesterday(self) {
+            return "Yesterday\(includeTime ? (" at " + formatted(date: .omitted, time: .shortened)) : "")"
+        } else {
+            return formatted(date: .abbreviated, time: includeTime ? .shortened : .omitted)
+        }
+    }
+    
+    @available(iOS 15, macOS 12.0, watchOS 6, *)
+    func humanReadableTimeFrameSinceNow() -> String {
+        let seconds = abs(self.timeIntervalSinceNow)
+        
+        if seconds < 60 {
+            // less than 60 seconds
+            return NSLocalizedString("Just Now", comment: "")
+        } else if seconds < 60*60 {
+            // less than 60 minutes
+            let minutes = Int(seconds/60)
+            if minutes == 1 {
+                return String(minutes) + NSLocalizedString(" Min Ago", comment: "")
+            } else {
+                return String(minutes) + NSLocalizedString(" Mins Ago", comment: "")
+            }
+        } else if seconds < 60*60*24 {
+            // less than 24 hours
+            let hours = Int(seconds/60/60)
+            if hours == 1 {
+                return String(hours) + NSLocalizedString(" Hour Ago", comment: "")
+            } else {
+                return String(hours) + NSLocalizedString(" Hours Ago", comment: "")
+            }
+        } else {
+            // days
+            return formatted(date: .abbreviated, time: .shortened)
+        }
+        
+    }
+
 }
 
 public extension Dictionary {
@@ -316,6 +364,14 @@ public extension String {
         return Set(self).isSubset(of: nums)
     }
     
+    var removingAttachmentCharacters: String {
+        return replacingOccurrences(of: String.attachmentCharacter, with: "")
+    }
+
+    var trimmingWhitespace: String {
+        return self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+    }
+
     func substring(_ range: Range<Int>) -> String {
         guard range.lowerBound >= 0 else {
             print("lowerBound is negative."); return ""
@@ -467,10 +523,6 @@ public extension String {
         return self.components(separatedBy: characterSet).joined(separator: string)
     }
 
-    var trimmingWhitespace: String {
-        return self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-    }
-
     func removeSpaces() -> String {
         return self.replacingOccurrences(of: " ", with: "")
     }
@@ -489,6 +541,34 @@ public extension String {
         return String(data: data, encoding: .utf8)
     }
     
+    func integerRanges(of substring: String) -> [(start: Int, end: Int)] {
+        // Find all ranges of the substring
+        let ranges = self.ranges(of: substring)
+        
+        // Convert ranges to integer offsets
+        return ranges.map { (start: self.distance(from: self.startIndex, to: $0.lowerBound),
+                             end: self.distance(from: self.startIndex, to: $0.upperBound) - 1) }
+    }
+    
+    func ranges(of substring: String) -> [Range<String.Index>] {
+        var ranges: [Range<String.Index>] = []
+        var start = self.startIndex
+        while let range = self.range(of: substring, range: start..<self.endIndex) {
+            ranges.append(range)
+            start = range.upperBound
+        }
+        return ranges
+    }
+    
+    func removingFirstCharacter() -> String {
+        guard !isEmpty else { return self }
+        return String(self[index(after: startIndex)...])
+    }
+    
+    func truncated(to length: Int) -> String {
+        return (self.count > length) ? self.prefix(length) + "…" : self
+    }
+
 }
 
 public extension Optional where Wrapped == String {
@@ -644,5 +724,45 @@ public extension CGRect {
         }
 
         return false
+    }
+}
+
+public extension ClosedRange {
+    func clamp(_ value : Bound) -> Bound {
+        return self.lowerBound > value ? self.lowerBound
+            : self.upperBound < value ? self.upperBound
+            : value
+    }
+}
+
+public extension NSRange {
+    init(_ loc: Int, _ len: Int) {
+        self.init(location: loc, length: len)
+    }
+    
+    var start: Int {
+        return location
+    }
+    
+    var end: Int {
+        return location + length
+    }
+}
+
+public extension NSString {
+    func allRanges(of substring: String) -> [NSRange] {
+        var ranges = [NSRange]()
+        var range = NSRange(location: 0, length: self.length)
+        
+        var foundRange = NSRange()
+        repeat {
+            foundRange = self.range(of: substring, options: [], range: range)
+            if foundRange.location != NSNotFound {
+                ranges.append(foundRange)
+                range = NSRange(location: foundRange.location + foundRange.length, length: self.length - foundRange.location - foundRange.length)
+            }
+        } while foundRange.location != NSNotFound
+        
+        return ranges
     }
 }
