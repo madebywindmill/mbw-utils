@@ -462,5 +462,46 @@ public extension NSImage {
     }
 }
 
+public extension NSFont {
+    static func systemItalicFont(ofSize fontSize: CGFloat) -> NSFont {
+        let systemFont = NSFont.systemFont(ofSize: fontSize, weight: .regular)
+        let descriptor = systemFont.fontDescriptor.withSymbolicTraits(.italic)
+        return NSFont(descriptor: descriptor, size: fontSize) ?? systemFont
+    }
+
+    static func systemBoldFont(ofSize fontSize: CGFloat, weight: NSFont.Weight) -> NSFont {
+        let systemFont = NSFont.systemFont(ofSize: fontSize, weight: weight)
+        let descriptor = systemFont.fontDescriptor.withSymbolicTraits(.italic)
+        return NSFont(descriptor: descriptor, size: fontSize) ?? systemFont
+    }
+
+    func mergedWithTraitsFrom(_ otherFont: NSFont) -> NSFont? {
+        let traits1 = self.fontDescriptor.symbolicTraits
+        let traits2 = otherFont.fontDescriptor.symbolicTraits
+
+        // Merge the traits
+        let mergedTraits = traits1.union(traits2)
+
+        // Get the base font's descriptor and apply the merged traits
+        let mergedDescriptor = self.fontDescriptor.withSymbolicTraits(mergedTraits)
+
+        // Return a new font with the merged descriptor and the size of the first font
+        return NSFont(descriptor: mergedDescriptor, size: self.pointSize)
+    }
+    
+    func mergeTrait(_ trait: NSFontDescriptor.SymbolicTraits) -> NSFont? {
+        let mergedTraits = self.fontDescriptor.symbolicTraits.union(trait)
+        let mergedDescriptor = self.fontDescriptor.withSymbolicTraits(mergedTraits)
+        return NSFont(descriptor: mergedDescriptor, size: self.pointSize)
+    }
+    
+    var hasBold: Bool {
+        return self.fontDescriptor.symbolicTraits.contains(.bold)
+    }
+    var hasItalic: Bool {
+        return self.fontDescriptor.symbolicTraits.contains(.italic)
+    }
+}
+
 
 #endif

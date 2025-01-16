@@ -114,6 +114,14 @@ public extension UIFont {
             ?? [:]
     }
     
+    var hasBold: Bool {
+        return self.fontDescriptor.symbolicTraits.contains(.traitBold)
+    }
+
+    var hasItalic: Bool {
+        return self.fontDescriptor.symbolicTraits.contains(.traitItalic)
+    }
+
     func with(traits: UIFontDescriptor.SymbolicTraits) -> UIFont {
         return UIFont(descriptor: self.fontDescriptor.withSymbolicTraits(traits)!, size: self.pointSize)
     }
@@ -135,6 +143,14 @@ public extension UIFont {
         } else {
             return self
         }
+    }
+
+    func mergeTrait(_ trait: UIFontDescriptor.SymbolicTraits) -> UIFont? {
+        let mergedTraits = self.fontDescriptor.symbolicTraits.union(trait)
+        guard let mergedDescriptor = self.fontDescriptor.withSymbolicTraits(mergedTraits) else {
+            return nil
+        }
+        return UIFont(descriptor: mergedDescriptor, size: self.pointSize)
     }
 
 }
