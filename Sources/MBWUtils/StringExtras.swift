@@ -795,3 +795,14 @@ public extension Character {
         return Character(scalar)
     }
 }
+
+public extension CharacterSet {
+    func contains(_ c: unichar) -> Bool {
+        if let unicodeScalar = UnicodeScalar(c) {
+            return contains(unicodeScalar)
+        } else {
+            // Handle the case where the unichar is not a valid Unicode scalar
+            return false
+        }
+    }
+}

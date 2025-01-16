@@ -292,13 +292,67 @@ open class SimpleNSStringParser {
     }
 }
 
-public extension CharacterSet {
-    func contains(_ c: unichar) -> Bool {
-        if let unicodeScalar = UnicodeScalar(c) {
-            return contains(unicodeScalar)
+// MARK: - Link parsing
+public extension SimpleNSStringParser {
+    
+    /// link-text: <[><chars min=0><]>
+    /// allowLeadingWhitespace should only be true when parsing from the beginning of a line
+    func parseLinkText(allowLeadingWhitespace: Bool) -> String? {
+        guard hasNext() else { return nil }
+        if allowLeadingWhitespace {
+            readUntilCharNotIn(whitespaceCharSet, max: 3)
+        }
+        guard nil != readString("[") else { return nil }
+        guard let text = readUntilCharacter("]", advanceAfter: true) else { return nil }
+        return text.string.trimmingWhitespace
+    }
+
+    /// link-label: <[><chars min=1><]>
+    /// allowLeadingWhitespace should only be true when parsing from the beginning of a line
+    func parseLinkLabel(allowLeadingWhitespace: Bool) -> String? {
+        guard hasNext() else { return nil }
+        if allowLeadingWhitespace {
+            readUntilCharNotIn(whitespaceCharSet, max: 3)
+        }
+        guard nil != readString("[") else { return nil }
+        guard let text = readUntilCharacter("]", advanceAfter: true) else { return nil }
+        // verify text has at least one non-newline non-whitespace character
+        guard text.rangeOfCharacter(from: nonWhitespaceAndNewlinesCharSet, range: text.wholeRange).location != NSNotFound else { return nil }
+        return text.string.trimmingWhitespace
+    }
+    
+    /// link-destination: either of
+    /// * <\<><chars min=0, no newlines><\>>
+    /// * <chars with no spaces or ascii control chars, min=1>
+    /// * <(><chars with no spaces or ascii control chars min=1><)>
+    // precompile for performance:
+    static let parseLinkDestinationAllowedCharSet = CharacterSet.controlCharacters.union(CharacterSet([" "])).inverted.union(CharacterSet(["/"]))
+    func parseLinkDestination() -> String? {
+        if let openingDel = readCharIn(["<", "("]) {
+            var closingDel = Character("x")
+            if openingDel == "(" {
+                closingDel = ")"
+            } else if openingDel == "<" {
+                closingDel = ">"
+            }
+            guard let text = readUntilCharacter(closingDel, advanceAfter: true) else { return nil }
+            return text.string.trimmingWhitespace
         } else {
-            // Handle the case where the unichar is not a valid Unicode scalar
-            return false
+            // handle format where there are no delimiters. requires at least 1 char with no spaces or ascii control chars. apparently also "/" allowed, for "/url".
+            guard let text = readUntilNotIn(Self.parseLinkDestinationAllowedCharSet) else { return nil }
+            guard text.length > 0 else { return nil }
+            return text.string
         }
     }
+
+    /// link-title: <", ', or (><characters min=1><", ', or )>
+    func parseLinkTitle() -> String? {
+        skipWhitespace()
+        guard let openingDel = readCharIn(["\"", "'", "("]) else { return nil }
+        let closingDel = openingDel == "(" ? ")" : openingDel
+        guard let text = readUntilCharacter(closingDel, advanceAfter: true) else { return nil }
+        guard text.length > 0 else { return nil }
+        return text.string
+    }
 }
+
