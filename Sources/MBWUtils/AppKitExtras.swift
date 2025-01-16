@@ -365,6 +365,7 @@ public extension NSColor {
 
 public extension NSImage {
     
+    @available(iOS 13, macOS 12.0, watchOS 6, *)
     class func downloadImageToFile(from url: URL, authorizationHeader: [String:String]? = nil) async throws -> URL {
         let imageData = try await Data.from(url: url, authorizationHeader: authorizationHeader)
         
@@ -391,6 +392,7 @@ public extension NSImage {
         }
     }
     
+    @available(iOS 13, macOS 12.0, watchOS 6, *)
     class func image(from url: URL, authorizationHeader: [String:String]? = nil, cachePolicy: NSURLRequest.CachePolicy) async throws -> NSImage? {
         if let cachedImage = cachedImageFrom(url: url, authorizationHeader: authorizationHeader) {
             return cachedImage
