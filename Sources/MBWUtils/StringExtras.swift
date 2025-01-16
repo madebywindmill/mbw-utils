@@ -612,6 +612,19 @@ public extension NSMutableAttributedString {
     }
 }
 
+public extension NSMutableString {
+    
+    func appendChar(_ c: unichar) {
+        let charString = NSString(characters: [c], length: 1)
+        self.append(charString as String)
+    }
+    
+    func trimWhitespace() {
+        let trimmedString = self.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.setString(trimmedString)
+    }
+}
+
 public extension NSAttributedString {
     
     var wholeRange: NSRange {
@@ -804,5 +817,23 @@ public extension CharacterSet {
             // Handle the case where the unichar is not a valid Unicode scalar
             return false
         }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, *)
+public extension NSRange {
+    func textRange(contentManager: NSTextContentManager) -> NSTextRange? {
+        guard let startLoc = contentManager.location(
+            contentManager.documentRange.location,
+            offsetBy: self.location)
+        else {
+            assertionFailure(); return nil
+        }
+        
+        guard let endLoc = contentManager.location(startLoc, offsetBy: self.length) else {
+            assertionFailure(); return nil
+        }
+        
+        return NSTextRange(location: startLoc, end: endLoc)
     }
 }

@@ -501,6 +501,16 @@ public extension ClosedRange {
     }
 }
 
+public extension Range where Bound == String.Index {
+    func location(in string: String) -> Int {
+        return string.distance(from: string.startIndex, to: self.lowerBound)
+    }
+    
+    func length(in string: String) -> Int {
+        return string.distance(from: self.lowerBound, to: self.upperBound)
+    }
+}
+
 public extension NSRange {
     init(_ loc: Int, _ len: Int) {
         self.init(location: loc, length: len)
