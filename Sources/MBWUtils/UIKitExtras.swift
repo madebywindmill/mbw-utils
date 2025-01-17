@@ -102,6 +102,22 @@ public extension UIButton {
 }
 
 public extension UIFont {
+    static func systemItalicFont(ofSize fontSize: CGFloat) -> UIFont {
+        let systemFont = UIFont.systemFont(ofSize: fontSize, weight: .regular)
+        guard let descriptor = systemFont.fontDescriptor.withSymbolicTraits(.traitItalic) else {
+            return systemFont
+        }
+        return UIFont(descriptor: descriptor, size: fontSize)
+    }
+
+    static func systemBoldFont(ofSize fontSize: CGFloat, weight: UIFont.Weight) -> UIFont {
+        let systemFont = UIFont.systemFont(ofSize: fontSize, weight: weight)
+        guard let descriptor = systemFont.fontDescriptor.withSymbolicTraits(.traitItalic) else {
+            return systemFont
+        }
+        return UIFont(descriptor: descriptor, size: fontSize)
+    }
+
     var weight: UIFont.Weight {
         guard let weightNumber = traits[.weight] as? NSNumber else { return .regular }
         let weightRawValue = CGFloat(weightNumber.doubleValue)
@@ -143,6 +159,22 @@ public extension UIFont {
         } else {
             return self
         }
+    }
+
+    func mergedWithTraitsFrom(_ otherFont: UIFont) -> UIFont? {
+        let traits1 = self.fontDescriptor.symbolicTraits
+        let traits2 = otherFont.fontDescriptor.symbolicTraits
+
+        // Merge the traits
+        let mergedTraits = traits1.union(traits2)
+
+        // Get the base font's descriptor and apply the merged traits
+        guard let mergedDescriptor = self.fontDescriptor.withSymbolicTraits(mergedTraits) else {
+            return nil
+        }
+
+        // Return a new font with the merged descriptor and the size of the first font
+        return UIFont(descriptor: mergedDescriptor, size: self.pointSize)
     }
 
     func mergeTrait(_ trait: UIFontDescriptor.SymbolicTraits) -> UIFont? {
