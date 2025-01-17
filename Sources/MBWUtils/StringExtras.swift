@@ -536,6 +536,9 @@ public extension NSString {
         hyperlinkRangesCache.totalCostLimit = 10 * 1024 // 10K
     }
     func cachedHyperlinkRanges() -> [NSRange]? {
+        guard Self.hyperlinkRangesCache != nil else {
+            return nil
+        }
         if let a = Self.hyperlinkRangesCache.object(forKey: self) {
             return a as? [NSRange]
         } else {
@@ -543,6 +546,10 @@ public extension NSString {
         }
     }
     static func cacheHyperlinkRanges(_ a: [NSRange], str: NSString) {
+        guard Self.hyperlinkRangesCache != nil else {
+            Logger.log("*** warning: trying to cache hyperlink range without first creating the cache object")
+            return
+        }
         hyperlinkRangesCache.setObject(a as NSArray, forKey: str)
     }
     
