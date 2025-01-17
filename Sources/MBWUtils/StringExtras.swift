@@ -567,7 +567,9 @@ public extension NSString {
             }
             ranges.append(range)
         }
-        Self.cacheHyperlinkRanges(ranges, str: self)
+        if Self.hyperlinkRangesCache != nil {
+            Self.cacheHyperlinkRanges(ranges, str: self)
+        }
         return ranges
     }
 }
