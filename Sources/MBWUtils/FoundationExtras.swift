@@ -113,7 +113,7 @@ public extension Date {
         return self.description(with: .current)
     }
     
-    @available(iOS 15, macOS 12.0, watchOS 6, *)
+    @available(iOS 15, macOS 12.0, watchOS 8, *)
     func friendlyTimeString(includeTime: Bool = true) -> String {
         if Calendar.current.isDateInToday(self) {
             return "Today\(includeTime ? (" at " + formatted(date: .omitted, time: .shortened)) : "")"
@@ -124,7 +124,7 @@ public extension Date {
         }
     }
     
-    @available(iOS 15, macOS 12.0, watchOS 6, *)
+    @available(iOS 15, macOS 12.0, watchOS 8, *)
     func humanReadableTimeFrameSinceNow() -> String {
         let seconds = abs(self.timeIntervalSinceNow)
         

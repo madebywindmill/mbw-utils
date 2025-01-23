@@ -576,6 +576,7 @@ public extension NSString {
 
 public extension NSMutableAttributedString {
     
+#if os(iOS) || os(macOS)
     /// Apply the given font across the range of the receiver. If a font already exists anywhere within the range, and the font has a trait of the given type, try to merge the trait with the given font. Otherwise replace any existing font with the given font.
     func mergeFont(_ font: CocoaFont,
                    range: NSRange,
@@ -601,6 +602,7 @@ public extension NSMutableAttributedString {
             }
         }
     }
+#endif
     
     /// Applies all the attributes from otherAttrStr to this attr string across the given range.
     func applyAttrsFrom(_ otherAttrStr: NSAttributedString, range: NSRange) {
@@ -775,6 +777,7 @@ public extension NSAttributedString {
         return (self.string as NSString).hasNewlineAt(location, newlineStr: &newlineStr)
     }
     
+#if os(iOS) || os(macOS)
     func addingBackBoldAndItalicStylesFrom(_ otherAttrStr: NSAttributedString) -> NSAttributedString {
         guard self.length == otherAttrStr.length else {
             assertionFailure(); return self
@@ -791,6 +794,7 @@ public extension NSAttributedString {
         
         return newAttrStr
     }
+#endif
 
     func allAttributes() -> [String: [NSRange]] {
         var attributeDictionary: [String: [NSRange]] = [:]
@@ -829,7 +833,8 @@ public extension CharacterSet {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst) // AppKit is for macOS
+@available(macOS 12.0, *)
 public extension NSRange {
     func textRange(contentManager: NSTextContentManager) -> NSTextRange? {
         guard let startLoc = contentManager.location(
@@ -846,3 +851,4 @@ public extension NSRange {
         return NSTextRange(location: startLoc, end: endLoc)
     }
 }
+#endif
