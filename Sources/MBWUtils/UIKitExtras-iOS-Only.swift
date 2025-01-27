@@ -550,7 +550,7 @@ public extension UIFont {
         } else {
             return self
         }
-    }
+    }    
 }
 
 public class AlwaysPopover : NSObject, UIPopoverPresentationControllerDelegate {
