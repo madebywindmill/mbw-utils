@@ -24,7 +24,6 @@ public extension UIFont {
         }
         return UIFont(descriptor: mergedDescriptor, size: self.pointSize)
     }
-
 }
 
 public extension UIColor {

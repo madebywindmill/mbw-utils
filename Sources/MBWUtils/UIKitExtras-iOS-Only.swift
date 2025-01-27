@@ -531,6 +531,28 @@ public extension UIImage {
     }
 }
 
+public extension UIFont {
+    func asSFRounded() -> UIFont {
+        if #available(iOS 13.0, *) {
+            let fontSize = self.pointSize
+            let weight = self.fontDescriptor.symbolicTraits.contains(.traitBold) ? UIFont.Weight.bold : UIFont.Weight.regular
+            let systemFont = UIFont.systemFont(ofSize: fontSize, weight: weight)
+
+            let font: UIFont
+
+            if let descriptor = systemFont.fontDescriptor.withDesign(.rounded) {
+                font = UIFont(descriptor: descriptor, size: fontSize)
+            } else {
+                font = systemFont
+            }
+
+            return font
+        } else {
+            return self
+        }
+    }
+}
+
 public class AlwaysPopover : NSObject, UIPopoverPresentationControllerDelegate {
     // Use this to force a popover on an iPhone in portrait mode. Without it, your vc will display in full screen.
     static let shared = AlwaysPopover()
