@@ -33,7 +33,10 @@ public let nonCharacterSet = whitespaceAndNewlinesCharSet.union(.controlCharacte
 public let regularCharacterSet = nonCharacterSet.union(.punctuationCharacters).inverted
 
 // precompile regex for speed
-public let hyperlinkRegex = try! NSRegularExpression(pattern: "https?:\\/\\/[^\\s\\/$.?#].[^\\s]*(?<![\\).\\)>])", options: [])
+public let hyperlinkRegex = try! NSRegularExpression(
+    pattern: "(https?://(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z]{2,6}\\b(?:/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?)",
+    options: []
+)
 
 public extension String {
     static var attachmentCharacter: String {
@@ -344,7 +347,7 @@ public extension String {
     func hyperlinkRanges() -> [NSRange] {
         return self.nsString.hyperlinkRanges()
     }
-    
+        
     func removingFromStart(_ str: String) -> String {
         var newStr = self
         if let range = self.range(of: str), range.lowerBound == self.startIndex {
