@@ -501,6 +501,7 @@ public extension NSString {
     }
     
     // Returns the range of the line of text surrounding the given location, not including any trailing newline character.
+    // Not CRLF safe!
     func rangeOfSurroundingLine(at location: Int) -> NSRange {
         guard length > 0, location >= 0, location < length else {
             return NSRange(NSNotFound, 0)
@@ -511,7 +512,9 @@ public extension NSString {
 
         // exclude newline if necessary
         var adjustedLineRange = lineRange
-        if lineRange.upperBound < length, character(at: lineRange.upperBound - 1) == unicharLF {
+        if adjustedLineRange.length > 0,
+           character(at: adjustedLineRange.upperBound - 1) == unicharLF
+        {
             adjustedLineRange.length -= 1
         }
 
@@ -519,6 +522,7 @@ public extension NSString {
     }
     
     // Returns the line of text surrounding the given location, not including any trailing newline character.
+    // Not CRLF safe!
     func surroundingLine(at location: Int) -> NSString {
         let range = rangeOfSurroundingLine(at: location)
         if range.location == NSNotFound {
@@ -624,6 +628,12 @@ public extension NSMutableAttributedString {
             }
         }
     }
+    
+    func replaceCharacters(in range: NSRange, string: String, attrs: StringAttrs) {
+        self.replaceCharacters(in: range, with: string)
+        self.setAttributes(attrs, range: NSRange(range.location, string.length))
+    }
+
 }
 
 public extension NSMutableString {
