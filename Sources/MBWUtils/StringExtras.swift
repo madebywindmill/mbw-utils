@@ -666,6 +666,17 @@ public extension NSAttributedString {
         return self.attributedSubstring(from: longestRange)
     }
     
+    // returns an array of tuples where .0 is the range and .1 is the attrs
+    func allAttributeRuns() -> [(NSRange, StringAttrs)] {
+        var runs: [(NSRange, [NSAttributedString.Key: Any])] = []
+        
+        self.enumerateAttributes(in: NSRange(location: 0, length: self.length), options: []) { attributes, range, _ in
+            runs.append((range, attributes))
+        }
+        
+        return runs
+    }
+
     func previousLineRange(from location: Int, includeNewline: Bool = false) -> NSRange? {
         if location == 0 {
             return nil
