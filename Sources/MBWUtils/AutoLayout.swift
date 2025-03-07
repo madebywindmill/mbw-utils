@@ -377,3 +377,20 @@ public extension NSLayoutConstraint {
     }
 }
 #endif
+
+/// Computes a linearly interpolated value between `minY` and `maxY` based on `val` within the range `minX` to `maxX`, then clamps the result between `minY` and `maxY`.
+///
+/// Can be useful for dynamically adjusting view constraints proportionally. In this context:
+/// - minX: a minimum screen/view width/height
+/// - maxX: a maximum screen/view width/height
+/// - minY: lower bound of possible output values
+/// - maxY: upper bound of possible output values
+/// - val: the actual screen/view width/height
+public func clampLinear<T: BinaryFloatingPoint>(_ minX: T, _ maxX: T, _ minY: T, _ maxY: T, _ val: T) -> T {
+    let slope = (maxY - minY) / (maxX - minX)
+    let interpolated = minY + slope * (val - minX)
+    return clamp(minY, interpolated, maxY)
+}
+public func clamp<T: Comparable>(_ minValue: T, _ val: T, _ maxValue: T) -> T {
+    return max(minValue, min(val, maxValue))
+}
