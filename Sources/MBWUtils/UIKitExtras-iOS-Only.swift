@@ -283,7 +283,7 @@ public extension UIViewController {
     
     // Using the name `present` works but can lead to collisions later if caller wants to call the non-async version in an async context.
     @available(iOS 13.0, *)
-    func presentAsync(_ viewControllerToPresent: UIViewController, customTransition: CATransitionType? = nil, duration: TimeInterval = 0.3, animated flag: Bool) async {
+    func presentAsync(_ viewControllerToPresent: UIViewController, customTransition: CATransitionType? = nil, duration: TimeInterval = 0.3, animated flag: Bool = true) async {
         await withCheckedContinuation { continuation in
             if let customTransition {
                 self.present(viewControllerToPresent, customTransition: customTransition, duration: duration) {
@@ -299,7 +299,7 @@ public extension UIViewController {
     
     // Using the name `dismiss` works but can lead to collisions later if caller wants to call the non-async version in an async context.
     @available(iOS 13.0, *)
-    func dismissAsync(customTransition: CATransitionType? = nil, duration: TimeInterval = 0.3, animated flag: Bool) async {
+    func dismissAsync(customTransition: CATransitionType? = nil, duration: TimeInterval = 0.3, animated flag: Bool = true) async {
         await withCheckedContinuation { continuation in
             if let customTransition {
                 self.dismiss(customTransition: customTransition, duration: duration) {
