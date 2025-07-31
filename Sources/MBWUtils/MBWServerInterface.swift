@@ -116,58 +116,13 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
                 }
             }
         }
-                
-        let unwrappedOptions = options ?? [.none : ""]
-
-        // Set up the URL
-        var url: URL?
         
-        if let overrideURL = unwrappedOptions[.overrideURL] as? URL {
-            url = overrideURL
-        } else if let customBaseURL = unwrappedOptions[.customBaseURL] as? URL {
-            url = (customBaseURL as NSURL).appendingPathComponent(endpoint)
-        } else {
-            url = (self.baseURL as NSURL).appendingPathComponent(endpoint)
-        }
-
-        // Add query strings, if any
-        url = url?.appending(queryPairs: queryPairs)
-        
-        if url == nil {
+        guard let request = getRequest(endpoint: endpoint, payload: payload, httpHeaders: httpHeaders, queryPairs: queryPairs, options: options, httpMethod: httpMethod) else {
             if self.hasLogOption(.error) {
                 Logger.fileLog("*** Couldn't create URL. Bad chars?")
             }
             actualCompletion?(nil, nil, MBWServerInterfaceError(code: .unknown))
             return
-        }
-        
-        var request = URLRequest(url: url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: serverInterfaceAPITimeout)
-        request.httpMethod = httpMethod.rawValue
-        
-        // Add auth (basic, bearer, or none)
-        if unwrappedOptions[.skipAuthHeader] == nil {
-            serverInterfaceAddAuthHeaders(request: &request)
-        }
-        
-        // Add the payload, if any
-        if unwrappedOptions[.formEncodeData] != nil {
-            self.addFormEncodedBody(payload: payload, request: &request)
-        } else if let formData = payload as? MBWServerInterfaceFormData  {
-            if !formData.isClosed {
-                Logger.log("*** Warning: formData wasn't closed so ending boundary is missing. It will be added for you.")
-                formData.close()
-            }
-            request.httpBody = formData.formData as Data
-            request.setValue("multipart/form-data; boundary=\(formData.formBoundary)", forHTTPHeaderField: "Content-Type")
-        } else {
-            self.addJSONBody(payload: payload, request: &request)
-        }
-                
-        // Add other http header fields
-        if let httpHeaders = httpHeaders {
-            for (key, value) in httpHeaders as! Dictionary<String, String> {
-                request.setValue(value, forHTTPHeaderField: key)
-            }
         }
         
         // We might want to use a custom URLSession
@@ -240,6 +195,71 @@ open class MBWServerInterface : NSObject, URLSessionDelegate, URLSessionTaskDele
         
         // And start it
         task.resume()
+    }
+    
+    /// Constructs and returns a URLRequest configured the same way as sendRequest, but does not send it.
+    /// - Parameters:
+    ///   - endpoint: The endpoint path to be appended to the base URL.
+    ///   - payload: The body payload (optional), can be a dictionary, Data, or MBWServerInterfaceFormData.
+    ///   - httpHeaders: Headers to add to the request.
+    ///   - queryPairs: Query items to add to the request URL.
+    ///   - options: RequestOptions dictionary.
+    ///   - httpMethod: The HTTP method to use.
+    /// - Returns: The configured URLRequest or nil if the URL could not be constructed.
+    public func getRequest(endpoint: String,
+                          payload: Any! = nil,
+                          httpHeaders: [String:Any]? = nil,
+                          queryPairs: [URLQueryItem] = [],
+                          options: Dictionary<RequestOptions, Any>? = nil,
+                          httpMethod: HTTPMethod) -> URLRequest? {
+        let unwrappedOptions = options ?? [.none : ""]
+
+        // Set up the URL
+        var url: URL?
+        if let overrideURL = unwrappedOptions[.overrideURL] as? URL {
+            url = overrideURL
+        } else if let customBaseURL = unwrappedOptions[.customBaseURL] as? URL {
+            url = (customBaseURL as NSURL).appendingPathComponent(endpoint)
+        } else {
+            url = (self.baseURL as NSURL).appendingPathComponent(endpoint)
+        }
+
+        // Add query strings, if any
+        url = url?.appending(queryPairs: queryPairs)
+
+        if url == nil {
+            return nil
+        }
+
+        var request = URLRequest(url: url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: serverInterfaceAPITimeout)
+        request.httpMethod = httpMethod.rawValue
+
+        // Add auth (basic, bearer, or none)
+        if unwrappedOptions[.skipAuthHeader] == nil {
+            serverInterfaceAddAuthHeaders(request: &request)
+        }
+
+        // Add the payload, if any
+        if unwrappedOptions[.formEncodeData] != nil {
+            self.addFormEncodedBody(payload: payload, request: &request)
+        } else if let formData = payload as? MBWServerInterfaceFormData {
+            if !formData.isClosed {
+                formData.close()
+            }
+            request.httpBody = formData.formData as Data
+            request.setValue("multipart/form-data; boundary=\(formData.formBoundary)", forHTTPHeaderField: "Content-Type")
+        } else {
+            self.addJSONBody(payload: payload, request: &request)
+        }
+
+        // Add other http header fields
+        if let httpHeaders = httpHeaders {
+            for (key, value) in httpHeaders as! Dictionary<String, String> {
+                request.setValue(value, forHTTPHeaderField: key)
+            }
+        }
+
+        return request
     }
     
     // Redirects will strip our auth header. Re-add it here.
@@ -443,3 +463,4 @@ public extension HTTPURLResponse {
         return (200...299).contains(statusCode)
     }
 }
+
