@@ -48,7 +48,7 @@ public class AlertController : UIAlertController {
     }
     
     @available(iOS 13.0, *)
-    public class func showSimpleAlert(
+    public class func showSimpleAlertAsync(
         title: String,
         message: String,
         buttonTitle: String = "OK",
@@ -70,13 +70,13 @@ public class AlertController : UIAlertController {
     }
 
     @available(iOS 13.0, *)
-    public class func showErrorAlert(
+    public class func showErrorAlertAsync(
         title: String,
         error: Error,
         tintColor: UIColor? = nil,
         vc: UIViewController
     ) async {
-        await showSimpleAlert(
+        await showSimpleAlertAsync(
             title: title,
             message: "\(error.localizedDescription) (\((error as NSError).code))",
             tintColor: tintColor,
