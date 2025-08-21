@@ -47,6 +47,43 @@ public class AlertController : UIAlertController {
                                         completion: completion)
     }
     
+    @available(iOS 13.0, *)
+    public class func showSimpleAlert(
+        title: String,
+        message: String,
+        buttonTitle: String = "OK",
+        tintColor: UIColor? = nil,
+        vc: UIViewController
+    ) async {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            let alert = AlertController(title: title, message: message, preferredStyle: .alert)
+            if let tintColor = tintColor {
+                alert.view.tintColor = tintColor
+            } else if let tintColor = AlertController.defaultTintColor {
+                alert.view.tintColor = tintColor
+            }
+            alert.addAction(UIAlertAction(title: buttonTitle, style: .default, handler: { _ in
+                continuation.resume()
+            }))
+            vc.present(alert, animated: true)
+        }
+    }
+
+    @available(iOS 13.0, *)
+    public class func showErrorAlert(
+        title: String,
+        error: Error,
+        tintColor: UIColor? = nil,
+        vc: UIViewController
+    ) async {
+        await showSimpleAlert(
+            title: title,
+            message: "\(error.localizedDescription) (\((error as NSError).code))",
+            tintColor: tintColor,
+            vc: vc
+        )
+    }
+    
     public class func showBlockingAlertWithSpinner(title: String,
                                                    allowCancel: Bool = false,
                                                    tintColor: UIColor? = nil,
@@ -98,3 +135,4 @@ public class AlertController : UIAlertController {
 }
 
 #endif
+
